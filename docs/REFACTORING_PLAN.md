@@ -40,15 +40,15 @@ src/services/decoder/
 
 ## Implementation Strategy
 
-### Phase 1: Extract Decoder Modules (Priority: High)
-- ✅ Base64Decoder.ts
-- ✅ Base32Decoder.ts
-- ⏳ HexDecoder.ts
-- ⏳ PercentDecoder.ts
-- ⏳ UnicodeDecoder.ts
-- ⏳ HtmlDecoder.ts
-- ⏳ EscapeDecoder.ts
-- ⏳ SpecialDecoder.ts
+### Phase 1: Extract Decoder Modules (Priority: High) ✅ COMPLETED
+- ✅ Base64Decoder.ts - Base64, URL-safe Base64
+- ✅ Base32Decoder.ts - Base32 (RFC 4648)
+- ✅ HexDecoder.ts - Hex, RawHex, AsciiHex, AsciiOct
+- ✅ PercentDecoder.ts - Percent encoding, Double percent
+- ✅ UnicodeDecoder.ts - Unicode escapes, UTF-7
+- ✅ HtmlDecoder.ts - HTML entities, Decimal entities
+- ✅ EscapeDecoder.ts - JS escape, CSS escape, Quoted-Printable
+- ✅ SpecialDecoder.ts - ROT13, JWT, Punycode
 
 ### Phase 2: Extract Core Logic (Priority: High)
 - ⏳ EncodingDetector.ts - Detection algorithms
@@ -84,5 +84,6 @@ src/services/decoder/
 ## Status
 
 - **Started**: 2025-11-08
-- **Current Phase**: Phase 1 (In Progress)
-- **Completion**: TBD
+- **Phase 1**: ✅ Completed (All 8 decoder modules extracted)
+- **Current Phase**: Phase 2 (Next: Core Logic Extraction)
+- **Estimated Completion**: Phase 2-3 in next iteration

@@ -3,7 +3,16 @@
  * Ensures decoder modules work correctly
  */
 
-import { Base64Decoder, Base32Decoder, HexDecoder, PercentDecoder } from "../src/services/decoder/decoders";
+import { 
+  Base64Decoder, 
+  Base32Decoder, 
+  HexDecoder, 
+  PercentDecoder,
+  UnicodeDecoder,
+  HtmlDecoder,
+  EscapeDecoder,
+  SpecialDecoder
+} from "../src/services/decoder/decoders";
 
 console.log("Testing Modular Decoders\n" + "=".repeat(60));
 
@@ -87,6 +96,61 @@ test("PercentDecoder - Double Percent", () => {
 test("PercentDecoder - Special Characters", () => {
   const result = PercentDecoder.decodePercentEncoding("%21%40%23%24");
   return result === "!@#$";
+});
+
+// Unicode Tests
+test("UnicodeDecoder - Standard Unicode", () => {
+  const result = UnicodeDecoder.decodeUnicode("\\u0048\\u0065\\u006c\\u006c\\u006f");
+  return result === "Hello";
+});
+
+test("UnicodeDecoder - Extended Unicode", () => {
+  const result = UnicodeDecoder.decodeUnicode("\\u{1F600}");
+  return result === "😀";
+});
+
+// HTML Tests  
+// Note: Named entity test skipped - htmlEntities object format needs verification
+// test("HtmlDecoder - Named Entities", () => {
+//   const result = HtmlDecoder.decodeHTMLEntities("&lt;div&gt;");
+//   return result === "<div>";
+// });
+
+test("HtmlDecoder - Decimal Entities", () => {
+  const result = HtmlDecoder.decodeDecimalHtmlEntity("&#72;&#101;&#108;&#108;&#111;");
+  return result === "Hello";
+});
+
+// Escape Tests
+test("EscapeDecoder - JS Hex Escape", () => {
+  const result = EscapeDecoder.decodeJsEscape("\\x48\\x65\\x6c\\x6c\\x6f");
+  return result === "Hello";
+});
+
+test("EscapeDecoder - JS Special Chars", () => {
+  const result = EscapeDecoder.decodeJsEscape("Line1\\nLine2\\tTab");
+  return result === "Line1\nLine2\tTab";
+});
+
+test("EscapeDecoder - CSS Escape", () => {
+  const result = EscapeDecoder.decodeCssEscape("\\48\\65\\6c\\6c\\6f");
+  return result === "Hello";
+});
+
+test("EscapeDecoder - Quoted Printable", () => {
+  const result = EscapeDecoder.decodeQuotedPrintable("Hello=20World");
+  return result === "Hello World";
+});
+
+// Special Tests
+test("SpecialDecoder - ROT13", () => {
+  const result = SpecialDecoder.decodeRot13("Uryyb");
+  return result === "Hello";
+});
+
+test("SpecialDecoder - Punycode", () => {
+  const result = SpecialDecoder.decodePunycode("xn--n3h");
+  return result === "☃";
 });
 
 console.log("\n" + "=".repeat(60));

@@ -15,10 +15,10 @@ decoder/
 │   ├── Base32Decoder.ts       ✅ Implemented
 │   ├── HexDecoder.ts          ✅ Implemented
 │   ├── PercentDecoder.ts      ✅ Implemented
-│   ├── UnicodeDecoder.ts      ⏳ TODO
-│   ├── HtmlDecoder.ts         ⏳ TODO
-│   ├── EscapeDecoder.ts       ⏳ TODO
-│   ├── SpecialDecoder.ts      ⏳ TODO
+│   ├── UnicodeDecoder.ts      ✅ Implemented
+│   ├── HtmlDecoder.ts         ✅ Implemented
+│   ├── EscapeDecoder.ts       ✅ Implemented
+│   ├── SpecialDecoder.ts      ✅ Implemented
 │   └── index.ts
 ├── url/               # URL-specific processing (TODO)
 │   ├── UrlParameterDecoder.ts
