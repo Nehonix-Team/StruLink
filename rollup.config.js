@@ -59,6 +59,6 @@ export default [
       format: "es",
     },
     plugins: [dts()],
-    external: ["nehonix-uri-processor"],
+    external: ["strulink"],
   },
 ];

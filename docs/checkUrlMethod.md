@@ -1,8 +1,8 @@
-# NehonixURIProcessor: checkUrl Method
+# StruLink: checkUrl Method
 
 ## Overview
 
-The `checkUrl` method in the `NehonixURIProcessor` library validates a URI string against a set of configurable rules, making it ideal for security testing, web application penetration testing, and URI analysis. It supports validation of standard URL components (e.g., `hostname`, `pathname`), literal values, and custom properties defined via the `fullCustomValidation` option. This method provides detailed validation results, including reasons for failure, to aid in debugging and analysis.
+The `checkUrl` method in the `StruLink` library validates a URI string against a set of configurable rules, making it ideal for security testing, web application penetration testing, and URI analysis. It supports validation of standard URL components (e.g., `hostname`, `pathname`), literal values, and custom properties defined via the `fullCustomValidation` option. This method provides detailed validation results, including reasons for failure, to aid in debugging and analysis.
 
 **Version**: 2.0.9\
 **License**: MIT
@@ -38,23 +38,23 @@ static checkUrl(url: string, options?: UrlValidationOptions): UrlCheckResult
 
 #### UrlValidationOptions
 
-| Option | Type | Default | Description |
-| --- | --- | --- | --- |
-| `strictMode` | `boolean` | `false` | Requires a leading slash before query parameters (e.g., `/path` vs. `path`). |
-| `allowUnicodeEscapes` | `boolean` | `true` | Allows Unicode escape sequences (e.g., `\uXXXX`) in query parameters. |
-| `rejectDuplicateParams` | `boolean` | `true` | Rejects URIs with duplicate query parameter keys (e.g., `?test=1&test=2`). |
-| `rejectDuplicatedValues` | `boolean` | `false` | Rejects URIs with duplicate query parameter values. |
-| `httpsOnly` | `boolean` | `false` | Restricts URIs to `https://` protocol only. |
-| `maxUrlLength` | `number` | `2048` | Maximum URL length in characters (0 to disable). |
-| `allowedTLDs` | `string[]` | `[]` | Allowed top-level domains (empty for all). |
-| `allowedProtocols` | `string[]` | `["http", "https"]` | Allowed protocols (e.g., `http`, `https`). |
-| `requireProtocol` | `boolean` | `false` | Requires an explicit protocol (e.g., `http://` or `https://`). |
-| `requirePathOrQuery` | `boolean` | `false` | Requires a path or query string (e.g., `/path` or `?query=test`). |
-| `strictParamEncoding` | `boolean` | `false` | Enforces strict URI encoding for query parameters. |
-| `debug` | `boolean` | `false` | Enables debug logging for custom validations, printing actual values. |
-| `customValidations` | `ComparisonRule[]` | `undefined` | Array of custom validation rules for URL components or custom properties. |
-| `literalValue` | `string` | `undefined` | Value to compare against `literal` rules in `customValidations`. |
-| `fullCustomValidation` | \`Record&lt;string, string | number&gt;\` | `undefined` |
+| Option                   | Type                       | Default             | Description                                                                  |
+| ------------------------ | -------------------------- | ------------------- | ---------------------------------------------------------------------------- |
+| `strictMode`             | `boolean`                  | `false`             | Requires a leading slash before query parameters (e.g., `/path` vs. `path`). |
+| `allowUnicodeEscapes`    | `boolean`                  | `true`              | Allows Unicode escape sequences (e.g., `\uXXXX`) in query parameters.        |
+| `rejectDuplicateParams`  | `boolean`                  | `true`              | Rejects URIs with duplicate query parameter keys (e.g., `?test=1&test=2`).   |
+| `rejectDuplicatedValues` | `boolean`                  | `false`             | Rejects URIs with duplicate query parameter values.                          |
+| `httpsOnly`              | `boolean`                  | `false`             | Restricts URIs to `https://` protocol only.                                  |
+| `maxUrlLength`           | `number`                   | `2048`              | Maximum URL length in characters (0 to disable).                             |
+| `allowedTLDs`            | `string[]`                 | `[]`                | Allowed top-level domains (empty for all).                                   |
+| `allowedProtocols`       | `string[]`                 | `["http", "https"]` | Allowed protocols (e.g., `http`, `https`).                                   |
+| `requireProtocol`        | `boolean`                  | `false`             | Requires an explicit protocol (e.g., `http://` or `https://`).               |
+| `requirePathOrQuery`     | `boolean`                  | `false`             | Requires a path or query string (e.g., `/path` or `?query=test`).            |
+| `strictParamEncoding`    | `boolean`                  | `false`             | Enforces strict URI encoding for query parameters.                           |
+| `debug`                  | `boolean`                  | `false`             | Enables debug logging for custom validations, printing actual values.        |
+| `customValidations`      | `ComparisonRule[]`         | `undefined`         | Array of custom validation rules for URL components or custom properties.    |
+| `literalValue`           | `string`                   | `undefined`         | Value to compare against `literal` rules in `customValidations`.             |
+| `fullCustomValidation`   | \`Record&lt;string, string | number&gt;\`        | `undefined`                                                                  |
 
 #### ComparisonRule
 
@@ -94,7 +94,15 @@ type ComparisonRule = [
 - `comparisonOperator`:
 
   ```typescript
-  type comparisonOperator = "===" | "==" | "<=" | ">=" | "!=" | "!==" | "<" | ">";
+  type comparisonOperator =
+    | "==="
+    | "=="
+    | "<="
+    | ">="
+    | "!="
+    | "!=="
+    | "<"
+    | ">";
   ```
 
 Rules can reference:
@@ -112,17 +120,49 @@ interface UrlCheckResult {
   isValid: boolean;
   validationDetails: {
     emptyCheck?: { isValid: boolean; message: string };
-    length?: { isValid: boolean; message: string; actualLength: number; maxLength: number };
-    protocol?: { isValid: boolean; message: string; detectedProtocol?: string; allowedProtocols?: string[] };
+    length?: {
+      isValid: boolean;
+      message: string;
+      actualLength: number;
+      maxLength: number;
+    };
+    protocol?: {
+      isValid: boolean;
+      message: string;
+      detectedProtocol?: string;
+      allowedProtocols?: string[];
+    };
     httpsOnly?: { isValid: boolean; message: string };
-    domain?: { isValid: boolean; type: string; message: string; hostname: string };
-    tld?: { isValid: boolean; message: string; detectedTld?: string; allowedTlds?: string[] };
+    domain?: {
+      isValid: boolean;
+      type: string;
+      message: string;
+      hostname: string;
+    };
+    tld?: {
+      isValid: boolean;
+      message: string;
+      detectedTld?: string;
+      allowedTlds?: string[];
+    };
     pathOrQuery?: { isValid: boolean; message: string };
     strictMode?: { isValid: boolean; message: string };
     querySpaces?: { isValid: boolean; message: string };
-    paramEncoding?: { isValid: boolean; message: string; invalidParams?: string[] };
-    duplicateParams?: { isValid: boolean; message: string; duplicatedKeys: string[] };
-    duplicateValues?: { isValid: boolean; message: string; duplicatedValues: string[] };
+    paramEncoding?: {
+      isValid: boolean;
+      message: string;
+      invalidParams?: string[];
+    };
+    duplicateParams?: {
+      isValid: boolean;
+      message: string;
+      duplicatedKeys: string[];
+    };
+    duplicateValues?: {
+      isValid: boolean;
+      message: string;
+      duplicatedValues: string[];
+    };
     unicodeEscapes?: { isValid: boolean; message: string };
     parsing?: { isValid: boolean; message: string };
     customValidations?: {
@@ -156,21 +196,21 @@ The `fullCustomValidation` option (aliased as `fcv`) allows users to define cust
 #### Validating URL Components and Custom Properties
 
 ```typescript
-import { NehonixURIProcessor } from "nehonix-uri-processor";
+import { StruLink } from "strulink";
 
-const uriAnalysed = NehonixURIProcessor.checkUrl("https://google.com/api", {
+const uriAnalysed = StruLink.checkUrl("https://google.com/api", {
   literalValue: "7",
   debug: true,
   fullCustomValidation: {
     domain: "test_domain",
-    testKey: "test"
+    testKey: "test",
   },
   customValidations: [
     ["hostname", "===", "google.com"],
     ["pathname", "===", "/api"],
     ["fullCustomValidation.domain", "===", "test_domain"],
-    ["fullCustomValidation.testKey", "===", "test"]
-  ]
+    ["fullCustomValidation.testKey", "===", "test"],
+  ],
 });
 
 console.log(uriAnalysed);
@@ -200,19 +240,19 @@ console.log(uriAnalysed);
 #### Using the `fcv` Alias with Numeric Comparison
 
 ```typescript
-import { NehonixURIProcessor } from "nehonix-uri-processor";
+import { StruLink } from "strulink";
 
-const uriAnalysed = NehonixURIProcessor.checkUrl("https://google.com/api", {
+const uriAnalysed = StruLink.checkUrl("https://google.com/api", {
   literalValue: "7",
   debug: true,
   fullCustomValidation: {
-    ta: 2
+    ta: 2,
   },
   customValidations: [
     ["hostname", "===", "google.com"],
     ["pathname", "===", "/api"],
-    ["fcv.ta", ">=", 2]
-  ]
+    ["fcv.ta", ">=", 2],
+  ],
 });
 
 console.log(uriAnalysed);
@@ -241,12 +281,10 @@ console.log(uriAnalysed);
 #### Handling Validation Failures
 
 ```typescript
-import { NehonixURIProcessor } from "nehonix-uri-processor";
+import { StruLink } from "strulink";
 
-const uriAnalysed = NehonixURIProcessor.checkUrl("https://google.com/api", {
-  customValidations: [
-    ["fullCustomValidation.domain", "===", "test_domain"]
-  ]
+const uriAnalysed = StruLink.checkUrl("https://google.com/api", {
+  customValidations: [["fullCustomValidation.domain", "===", "test_domain"]],
 });
 
 console.log(uriAnalysed);
@@ -293,21 +331,21 @@ The `checkUrl` method is designed for security testing and URI validation:
 ## Example Integration with Security Testing
 
 ```typescript
-import { NehonixURIProcessor } from "nehonix-uri-processor";
+import { StruLink } from "strulink";
 
 // Validate a URL with custom metadata for security testing
-const result = NehonixURIProcessor.checkUrl("https://example.com/login", {
+const result = StruLink.checkUrl("https://example.com/login", {
   httpsOnly: true,
   strictParamEncoding: true,
   fullCustomValidation: {
     sessionId: "abc123",
-    version: 1.2
+    version: 1.2,
   },
   customValidations: [
     ["pathname", "===", "/login"],
     ["fcv.sessionId", "===", "abc123"],
-    ["fcv.version", ">=", 1.0]
-  ]
+    ["fcv.version", ">=", 1.0],
+  ],
 });
 
 if (!result.isValid) {
@@ -320,7 +358,7 @@ if (!result.isValid) {
 
 ## See Also
 
-- NehonixURIProcessor README
+- StruLink README
 - autoDetectAndDecode
 - analyzeURL
 

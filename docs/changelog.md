@@ -1,20 +1,24 @@
-# NehonixURIProcessor Changelog
+# StruLink Changelog
+
 ## [2.3.1] - 2025-04-28
 
 ### New Features
 
 - **DOM Analysis**: Added comprehensive DOM scanning to detect malicious content
+
   - Support for analyzing HTML content, attributes, scripts, and links
   - Optional iframe scanning capability (same-origin only)
   - Visual blocking overlay for malicious content protection
   - Mutation observer for real-time DOM monitoring
 
 - **Request Monitoring**: Added network request analysis capabilities
+
   - Real-time monitoring using Performance Observer API
   - Configurable filters for XHR, fetch, images, and script requests
   - Notification system for detected threats
 
 - **React Integration**:
+
   - New `useNehonixShield` hook for functional components
   - Higher-order component `withDomAnalysis` for easy component wrapping
   - Protection components:
@@ -76,7 +80,7 @@
   - `sanitizeInput`: Sanitizes input strings by removing potentially malicious patterns (unstable, use with caution).
   - `needsDeepScan`: Lightweight check to determine if a string requires deep scanning, useful as a pre-filter for malicious pattern detection.
   - `detectMaliciousPatterns`: Analyzes input for malicious patterns (e.g., XSS, SQL injection) with detailed detection results and configurable options.
-- **Import Alias**: Added support for importing `NehonixURIProcessor` as `__processor__` for shorter, more convenient usage.
+- **Import Alias**: Added support for importing `StruLink` as `__processor__` for shorter, more convenient usage.
 - **Type Definitions**:
   - Introduced `DetectedPattern` interface for structuring malicious pattern detection results.
   - Added `AsyncUrlCheckResult` type, extending `UrlCheckResult` with `maliciousPatterns` in `validationDetails`.

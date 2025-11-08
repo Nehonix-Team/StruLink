@@ -33,7 +33,7 @@ Our project adheres to a Code of Conduct that sets expectations for participatio
 1. Fork the repository on GitHub
 2. Clone your fork locally:
    ```bash
-   git clone https://github.com/NEHONIX/NehonixUriProcessor/tree/features/nehonix-security-booster
+   git clone https://github.com/Nehonix-Team/StruLink.git
    ```
 3. Install dependencies:
    ```bash
@@ -43,7 +43,7 @@ Our project adheres to a Code of Conduct that sets expectations for participatio
    ```
 4. Add the original repository as an upstream remote:
    ```bash
-   git remote add upstream https://github.com/nehonix/nehonixUriProcessor.git
+   git remote add upstream https://github.com/Nehonix-Team/StruLink.git
    ```
 
 ## Development Workflow

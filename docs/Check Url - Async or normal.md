@@ -1,8 +1,8 @@
-# NehonixURIProcessor: checkUrl and asyncCheckUrl Methods
+# StruLink: checkUrl and asyncCheckUrl Methods
 
 ## Overview
 
-The `checkUrl` and `asyncCheckUrl` methods in the `NehonixURIProcessor` library validate URI strings against configurable rules, making them ideal for security testing, web application penetration testing, and URI analysis. Both methods support validation of standard URL components (e.g., `hostname`, `pathname`), literal values, and custom properties via the `fullCustomValidation` option. The key difference is that `checkUrl` operates synchronously, while `asyncCheckUrl` is asynchronous and includes malicious pattern detection, with results accessible via `validationDetails.maliciousPatterns`.
+The `checkUrl` and `asyncCheckUrl` methods in the `StruLink` library validate URI strings against configurable rules, making them ideal for security testing, web application penetration testing, and URI analysis. Both methods support validation of standard URL components (e.g., `hostname`, `pathname`), literal values, and custom properties via the `fullCustomValidation` option. The key difference is that `checkUrl` operates synchronously, while `asyncCheckUrl` is asynchronous and includes malicious pattern detection, with results accessible via `validationDetails.maliciousPatterns`.
 
 **Version**: 2.2.0  
 **License**: MIT
@@ -345,7 +345,7 @@ Both `checkUrl` and `asyncCheckUrl` validate URIs, but their execution models an
 ### Validating with checkUrl
 
 ```typescript
-import { __processor__ } from "nehonix-uri-processor";
+import { __processor__ } from "strulink";
 
 const result = __processor__.checkUrl("https://google.com/api", {
   literalValue: "nehonix.space",
@@ -388,7 +388,7 @@ console.log(result);
 ### Validating with asyncCheckUrl
 
 ```typescript
-import { __processor__ } from "nehonix-uri-processor";
+import { __processor__ } from "strulink";
 
 const result = await __processor__.asyncCheckUrl(
   "https://example.com?user=<script>",
@@ -453,7 +453,7 @@ Both methods are designed for security testing and URI validation:
 ## Example Integration with Security Testing
 
 ```typescript
-import { __processor__ } from "nehonix-uri-processor";
+import { __processor__ } from "strulink";
 
 async function validateLoginUrl(url: string) {
   const result = await __processor__.asyncCheckUrl(url, {
@@ -481,7 +481,7 @@ validateLoginUrl("https://example.com/login?user=admin");
 
 ## See Also
 
-- NehonixURIProcessor README
+- StruLink README
 - `autoDetectAndDecode`
 - `scanUrl`
 - `detectMaliciousPatterns`

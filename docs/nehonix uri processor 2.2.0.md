@@ -1,8 +1,8 @@
-# NehonixURIProcessor v2.2.0
+# StruLink v2.2.0
 
 ## Overview
 
-The `NehonixURIProcessor` class provides methods to:
+The `StruLink` class provides methods to:
 
 - Validate URIs with configurable rules and advanced malicious pattern detection
 - Automatically detect and decode encoding types in URIs with the recommended `autoDetectAndDecode` or the new asynchronous `asyncAutoDetectAndDecode` method
@@ -20,6 +20,7 @@ Version 2.2.0 introduces several new features focused on security, performance, 
 ### Enhanced Security
 
 - **Malicious Pattern Detection**: New methods to detect SQL injection, XSS, and other attack patterns
+
   - `detectMaliciousPatterns()`: Analyzes input for malicious patterns
   - `scanUrl()`: Provides detailed security analysis of URLs
   - `needsDeepScan()`: Lightweight pre-filter for efficient processing
@@ -36,6 +37,7 @@ Version 2.2.0 introduces several new features focused on security, performance, 
 ### Framework Integrations
 
 - **Express Middleware**: Ready-to-use middleware for securing Express applications
+
   - `nehonixShieldMiddleware`: Protects routes from malicious URIs
   - `scanRequest`: Analyzes Express request objects
 
@@ -70,7 +72,7 @@ Version 2.2.0 introduces several new features focused on security, performance, 
 
 ```typescript
 const input = "<script>alert('XSS')</script>";
-const result = NehonixURIProcessor.detectMaliciousPatterns(input);
+const result = StruLink.detectMaliciousPatterns(input);
 console.log(result.isMalicious); // true
 console.log(result.patternType); // "XSS"
 ```
@@ -79,7 +81,7 @@ console.log(result.patternType); // "XSS"
 
 ```typescript
 const complexUri = "https://example.com?data=SGVsbG8gV29ybGQ=";
-const decoded = await NehonixURIProcessor.asyncAutoDetectAndDecode(complexUri);
+const decoded = await StruLink.asyncAutoDetectAndDecode(complexUri);
 console.log(decoded); // https://example.com?data=Hello World
 ```
 
@@ -87,24 +89,26 @@ console.log(decoded); // https://example.com?data=Hello World
 
 ```typescript
 import express from "express";
-import { nehonixShieldMiddleware } from "nehonix-uri-processor";
+import { nehonixShieldMiddleware } from "strulink";
 
 const app = express();
-app.use(nehonixShieldMiddleware({
-  blockOnMalicious: true,
-  logDetails: true,
-  minScore: 50
-}));
+app.use(
+  nehonixShieldMiddleware({
+    blockOnMalicious: true,
+    logDetails: true,
+    minScore: 50,
+  })
+);
 ```
 
 ### React Hook Usage
 
 ```typescript
-import { useNehonixShield } from "nehonix-uri-processor";
+import { useNehonixShield } from "strulink";
 
 const MyComponent = () => {
   const { analyzeUrl } = useNehonixShield();
-  
+
   const handleSubmit = async (url) => {
     const analysis = await analyzeUrl(url);
     if (analysis.isSafe) {
@@ -113,14 +117,14 @@ const MyComponent = () => {
       // Handle potentially malicious URL
     }
   };
-  
+
   return <form onSubmit={handleSubmit}>...</form>;
 };
 ```
 
 ## Compatibility
 
-This version maintains backward compatibility with v2.1.x while adding new capabilities. All existing code using NehonixURIProcessor should continue to work without modifications.
+This version maintains backward compatibility with v2.1.x while adding new capabilities. All existing code using StruLink should continue to work without modifications.
 
 ## Performance Considerations
 

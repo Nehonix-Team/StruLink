@@ -1,9 +1,9 @@
-import { NehonixURIProcessor } from "..";
+import { StruLink } from "..";
 import { NSS } from "../services/NehonixSecurity.service";
 
 // Test SQLi/XSS detection
 async function runTest(input: string) {
-  const result = NehonixURIProcessor.autoDetectAndDecode(input);
+  const result = StruLink.autoDetectAndDecode(input);
   console.log(result.val());
   return result;
 }

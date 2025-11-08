@@ -1,10 +1,25 @@
-# NehonixURIProcessor
+# StruLink
 
-A comprehensive TypeScript library for detecting, decoding, and encoding various URI encoding schemes. This utility is designed for security testing, web application penetration testing, and analyzing potential attacks, with powerful auto-detection and decoding capabilities.
+> **⚠️ IMPORTANT NOTICE - Repository Refactoring**
+> 
+> This is a **simplified and refocused version** of the original [NehonixURIProcessor](https://github.com/nehonix/nehonixUriProcessor).
+> 
+> **What changed:**
+> - **Removed**: Express/React integrations, AI/ML features, Python microservices
+> - **Focus**: Pure URL/URI encoding, decoding, validation, and parsing utilities
+> - **New features** will be developed here in StruLink
+> - **Original library** at [nehonix/nehonixUriProcessor](https://github.com/nehonix/nehonixUriProcessor) will continue to work but won't receive new features
+> 
+> If you need framework integrations (Express/React) or ML-based security features, use the [original library](https://github.com/nehonix/nehonixUriProcessor). For lightweight URL utilities, use StruLink.
 
-**Version**: 2.3.1
+---
+
+A focused TypeScript library for URL/URI encoding, decoding, validation, and parsing. Designed for developers who need powerful URL manipulation utilities without framework dependencies.
+
+**Version**: 2.3.17  
 **License**: MIT  
-**Documentation**: [lab.nehonix.space](https://lab.nehonix.space/nehonix_viewer/_doc/NehonixUriProcessor/readme)
+**Repository**: [github.com/Nehonix-Team/StruLink](https://github.com/Nehonix-Team/StruLink)  
+**Documentation**: [lab.nehonix.space](https://lab.nehonix.space/nehonix_viewer/_doc/StruLink/readme)
 
 ## Table of Contents
 
@@ -26,9 +41,6 @@ A comprehensive TypeScript library for detecting, decoding, and encoding various
     - [`sanitizeInput(input: string, options?: object)`](#sanitizeinputinput-string-options-object)
     - [`needsDeepScan(input: string)`](#needsdeepscaninput-string)
     - [`detectMaliciousPatterns(input: string, options?: MaliciousPatternOptions)`](#detectmaliciouspatternsinput-string-options-maliciouspatternoptions)
-  - [Framework Integrations](#framework-integrations)
-    - [Express Middleware](#express-middleware)
-    - [React Utils](#react-utils)
 - [Supported Encoding Types](#supported-encoding-types)
 - [Detection Capabilities](#detection-capabilities)
 - [Security Testing Features](#security-testing-features)
@@ -37,31 +49,33 @@ A comprehensive TypeScript library for detecting, decoding, and encoding various
 
 ## Introduction
 
-`NehonixURIProcessor` is a powerful TypeScript library for developers and security professionals. It provides advanced tools for URI validation, encoding/decoding, and security analysis. For convenience, you can import it as `__processor__` to shorten the name (both are the same):
+`StruLink` is a powerful TypeScript library for developers and security professionals. It provides advanced tools for URI validation, encoding/decoding, and security analysis. For convenience, you can import it as `__processor__` to shorten the name (both are the same):
 
 ```typescript
-import { NehonixURIProcessor } from "nehonix-uri-processor";
+import { StruLink } from "strulink";
 ` OR`;
-import { __processor__ } from "nehonix-uri-processor";
+import { __processor__ } from "strulink";
 ```
 
 ## Overview
 
-The `NehonixURIProcessor` class offers:
+The `StruLink` class offers:
 
 - **URI Validation**: Validate URIs with customizable rules and malicious pattern detection.
 - **Auto-Detection and Decoding**: Decode complex URI encodings using `autoDetectAndDecode` or `asyncAutoDetectAndDecode`.
-- **Encoding/Decoding**: Support for multiple encoding schemes (e.g., Base64, percent encoding, JWT).
+- **Encoding/Decoding**: Support for multiple encoding schemes (e.g., Base64, percent encoding, hex, punycode).
 - **Security Analysis**: Analyze URLs for vulnerabilities and generate WAF bypass variants.
-- **Framework Integration**: Seamless integration with Express and React.
 - **Internationalized URIs**: Handle non-ASCII characters with punycode support.
+- **Lightweight**: No framework dependencies - works anywhere JavaScript/TypeScript runs.
 
 ## Installation
 
-Install the library and its dependency:
+Install the library:
 
 ```bash
-npm install nehonix-uri-processor punycode
+npm install strulink
+# or
+bun add strulink
 ```
 
 ## Usage
@@ -69,10 +83,7 @@ npm install nehonix-uri-processor punycode
 Below are examples showcasing key features:
 
 ```typescript
-import {
-  NehonixURIProcessor as __processor__,
-  MaliciousPatternType,
-} from "nehonix-uri-processor";
+import { StruLink as __processor__, MaliciousPatternType } from "strulink";
 
 async function main() {
   // Validate a URI with malicious pattern detection
@@ -442,7 +453,7 @@ Both `checkUrl` and `asyncCheckUrl` validate URIs, but their execution models an
 ### Validating with checkUrl
 
 ````typescript
-import { __processor__ } from "nehonix-uri-processor";
+import { __processor__ } from "strulink";
 
 const result = __processor__.checkUrl("https://google.com/api", {
   literalValue: "nehonix.space",
@@ -634,142 +645,6 @@ const result = __processor__.detectMaliciousPatterns(
 );
 console.log(result); // Detailed malicious pattern analysis
 ```
-
-### Framework Integrations
-
-#### Express Middleware
-
-Validate and decode URIs in Express applications.
-
-- **Setup**:
-
-```typescript
-import express from "express";
-import { nehonixShieldMiddleware } from "nehonix-uri-processor";
-
-const app = express();
-app.use(nehonixShieldMiddleware({ blockOnMalicious: true }));
-app.get("/", (req, res) => res.send("Hello world"));
-app.listen(3000, () => console.log("Server running on port 3000"));
-```
-
-#### React Utils
-
-## Overview
-
-The NSB DOM & Request Analysis feature enhances web application security by adding real-time scanning of DOM elements and network requests. This feature builds upon the existing Nehonix Security Booster framework to detect and block malicious content before it reaches the user.
-
-## Features
-
-- **DOM Analysis**: Scan the document object model for malicious patterns
-- **Request Monitoring**: Analyze network requests in real-time
-- **Automatic Protection**: Components for easy integration of security features
-- **Blocking Capability**: Optionally block and alert on malicious content
-- **Developer Controls**: Toggle security features and access analysis results
-
-## Quick Start
-
-Wrap your application in the `NehonixShieldProvider` to enable security features:
-
-- **Basic Usage**:
-
-```typescript
-import { NehonixShieldProvider, useNehonixShield } from "nehonix-uri-processor";
-
-const App = () => (
-  <NehonixShieldProvider>
-    <SecurityDemo />
-  </NehonixShieldProvider>
-);
-
-const SecurityDemo = () => {
-  const { scanUrl } = useNehonixShield();
-  const handleAnalyze = async () => {
-    const result = await scanUrl("https://example.com?category=books");
-    console.log(result);
-  };
-  return <button onClick={handleAnalyze}>Analyze URL</button>;
-};
-```
-
-## Core Components
-
-### NehonixShieldProvider
-
-The main provider component that makes security features available to your application.
-
-```jsx
-<NehonixShieldProvider defaultOptions={{ debug: false }} autoBlocking={true}>
-  {children}
-</NehonixShieldProvider>
-```
-
-Props:
-
-- `defaultOptions`: Default options for security analysis
-- `autoBlocking`: Whether to block malicious content by default
-
-### NehonixProtector
-
-All-in-one protection component that enables both DOM and request analysis.
-
-```jsx
-<NehonixProtector
-  domOptions={{ includeScripts: true, scanIframes: true }}
-  requestOptions={{ includeFetch: true, includeXHR: true }}
-  domInterval={60000} // Re-scan DOM every minute
->
-  <UserGeneratedContent />
-</NehonixProtector>
-```
-
-Props:
-
-- `domOptions`: Options for DOM analysis
-- `requestOptions`: Options for request analysis
-- `domInterval`: Interval in milliseconds for periodic DOM scanning (null for no periodic scanning)
-
-Example of using:
-
-```typescript
-// Basic setup with automatic blocking
-<NehonixShieldProvider autoBlocking={true}>
-  <YourApp />
-</NehonixShieldProvider>
-
-// Add comprehensive protection to a specific component
-<NehonixProtector
-  domOptions={{ includeScripts: true, scanIframes: true }}
-  requestOptions={{ includeFetch: true, includeXHR: true }}
-  domInterval={30000} // Re-scan DOM every 30 seconds
->
-  <UserContent />
-</NehonixProtector>
-
-// Use the hook for manual control
-function SecureComponent() {
-  const { analyzeDom, blockingEnabled, setBlockingEnabled } = useNehonixShield();
-
-  const handleUserContent = (content) => {
-    // Manually analyze content before rendering
-    analyzeDom({
-      targetSelector: "#user-content",
-      includeScripts: true
-    });
-  };
-
-  return (
-    <div>
-      <button onClick={() => setBlockingEnabled(!blockingEnabled)}>
-        {blockingEnabled ? "Disable" : "Enable"} Protection
-      </button>
-      <div id="user-content">{/* user content */}</div>
-    </div>
-  );
-}
-```
-
-## [Read more.](./docs/react%20component%20protector.md)
 
 ## Supported Encoding Types
 

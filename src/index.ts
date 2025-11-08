@@ -11,28 +11,28 @@ import { NehonixSafetyLayer } from "./utils/NehonixSafetyLayer";
  * @author nehonix
  * @version 2.1.2
  * @since 12/04/2025
- * The `NehonixURIProcessor` class provides methods to analyze URLs, generate encoding variants for Web Application Firewall (WAF) bypass testing,
+ * The `StruLink` class provides methods to analyze URLs, generate encoding variants for Web Application Firewall (WAF) bypass testing,
  * and automatically detect and decode various URI encodings. It supports a range of encoding types, including percent-encoding, Base64, and hexadecimal,
  * making it suitable for penetration testing, vulnerability assessment, and secure data processing.
  *
- * For detailed documentation on specific methods, see the [changelog](https://lab.nehonix.space/nehonix_viewer/_doc/NehonixUriProcessor/changelog) and method-specific guides.
+ * For detailed documentation on specific methods, see the [changelog](https://lab.nehonix.space/nehonix_viewer/_doc/StruLink/changelog) and method-specific guides.
  *
  * @example
  * ```typescript
  * // Check if a string is a valid URI
- * const isValid = NehonixURIProcessor.isValidUri("https://nehonix.space?test=true");
+ * const isValid = StruLink.isValidUri("https://nehonix.space?test=true");
  * console.log(isValid); // true
  *
  * // Decode a Base64-encoded URI parameter
- * const decoded = NehonixURIProcessor.autoDetectAndDecode("https://nehonix.space?test=dHJ1ZQ==");
+ * const decoded = StruLink.autoDetectAndDecode("https://nehonix.space?test=dHJ1ZQ==");
  * console.log(decoded); // https://nehonix.space?test=true
  *
  * // Generate WAF bypass variants
- * const variants = NehonixURIProcessor.generateWAFBypassVariants("<script>");
+ * const variants = StruLink.generateWAFBypassVariants("<script>");
  * console.log(variants); // { percent: "%3Cscript%3E", base64: "PHNjcmlwdD4=", ... }
  * ```
  */
-class NehonixURIProcessor {
+class StruLink {
   /**
    * Generates encoding variants of a string for Web Application Firewall (WAF) bypass testing.
    *
@@ -43,7 +43,7 @@ class NehonixURIProcessor {
    * @returns An object containing different encoding variants, where keys are encoding types (e.g., `percent`, `base64`) and values are the encoded strings.
    * @example
    * ```typescript
-   * const variants = NehonixURIProcessor.generateWAFBypassVariants("<script>");
+   * const variants = StruLink.generateWAFBypassVariants("<script>");
    * console.log(variants);
    * // Output: { percent: "%3Cscript%3E", base64: "PHNjcmlwdD4=", hex: "3C7363726970743E", ... }
    * ```
@@ -63,7 +63,7 @@ class NehonixURIProcessor {
    *          for each parameter, including potential attack vectors.
    * @example
    * ```typescript
-   * const analysis = NehonixURIProcessor.analyzeURL("https://nehonix.space?user=admin");
+   * const analysis = StruLink.analyzeURL("https://nehonix.space?user=admin");
    * console.log(analysis);
    * // Output: { url: "https://nehonix.space", params: { user: { value: "admin", risks: ["sql_injection", "xss"] } }, ... }
    * ```
@@ -84,10 +84,10 @@ class NehonixURIProcessor {
    * @throws Throws an error if the encoding type is unsupported or the input is invalid.
    * @example
    * ```typescript
-   * const encoded = NehonixURIProcessor.encode("hello world", "percentEncoding");
+   * const encoded = StruLink.encode("hello world", "percentEncoding");
    * console.log(encoded); // hello%20world
    *
-   * const base64 = NehonixURIProcessor.encode("true", "base64");
+   * const base64 = StruLink.encode("true", "base64");
    * console.log(base64); // dHJ1ZQ==
    * ```
    */
@@ -107,11 +107,11 @@ class NehonixURIProcessor {
    * @returns An object containing the most likely encoding type, confidence score, and any detected nested encodings.
    * @example
    * ```typescript
-   * const detection = NehonixURIProcessor.detectEncoding("hello%20world");
+   * const detection = StruLink.detectEncoding("hello%20world");
    * console.log(detection);
    * // Output: { mostLikely: "percentEncoding", confidence: 0.95, nestedTypes: [] }
    *
-   * const nested = NehonixURIProcessor.detectEncoding("aHR0cHM6Ly9leGFtcGxlLmNvbQ==", 2);
+   * const nested = StruLink.detectEncoding("aHR0cHM6Ly9leGFtcGxlLmNvbQ==", 2);
    * console.log(nested);
    * // Output: { mostLikely: "base64", confidence: 0.9, nestedTypes: ["percentEncoding"], ... }
    * ```
@@ -132,10 +132,10 @@ class NehonixURIProcessor {
    * @returns The decoded string in plaintext (e.g., `https://nehonix.space?test=true`).
    * @example
    * ```typescript
-   * const decoded = NehonixURIProcessor.autoDetectAndDecode("https://nehonix.space?test=dHJ1ZQ==");
+   * const decoded = StruLink.autoDetectAndDecode("https://nehonix.space?test=dHJ1ZQ==");
    * console.log(decoded.val()); // https://nehonix.space?test=true
    *
-   * const nested = NehonixURIProcessor.autoDetectAndDecode("aHR0cHM6Ly9leGFtcGxlLmNvbQ==");
+   * const nested = StruLink.autoDetectAndDecode("aHR0cHM6Ly9leGFtcGxlLmNvbQ==");
    * console.log(nested.val()); // https://nehonix.space
    * ```
    */
@@ -153,7 +153,7 @@ class NehonixURIProcessor {
    * @returns An object containing the decoded string, detected encoding type, and confidence score.
    * @example
    * ```typescript
-   * const result = NehonixURIProcessor.detectAndDecode("dHJ1ZQ==");
+   * const result = StruLink.detectAndDecode("dHJ1ZQ==");
    * console.log(result);
    * // Output: { val: "true", encodingType: "base64", confidence: 0.9 }
    * ```
@@ -186,13 +186,13 @@ class NehonixURIProcessor {
    * @returns `true` if the URL is valid according to the specified options, `false` otherwise.
    * @example
    * ```typescript
-   * const isValid = NehonixURIProcessor.isValidUrl("https://nehonix.space?test=true");
+   * const isValid = StruLink.isValidUrl("https://nehonix.space?test=true");
    * console.log(isValid); // true
    *
-   * const isLocalhostValid = NehonixURIProcessor.isValidUrl("http://localhost:8080", { allowLocalhost: true });
+   * const isLocalhostValid = StruLink.isValidUrl("http://localhost:8080", { allowLocalhost: true });
    * console.log(isLocalhostValid); // true
    *
-   * const isLocalhostInvalid = NehonixURIProcessor.isValidUrl("http://localhost:8080");
+   * const isLocalhostInvalid = StruLink.isValidUrl("http://localhost:8080");
    * console.log(isLocalhostInvalid); // false
    * ```
    * @see checkUrl
@@ -220,13 +220,13 @@ class NehonixURIProcessor {
    * @throws Throws an error if the encoding type is unsupported or the input is invalid.
    * @example
    * ```typescript
-   * const decoded = NehonixURIProcessor.decode("hello%20world", "percentEncoding");
+   * const decoded = StruLink.decode("hello%20world", "percentEncoding");
    * console.log(decoded); // hello world
    *
-   * const base64 = NehonixURIProcessor.decode("dHJ1ZQ==", "base64");
+   * const base64 = StruLink.decode("dHJ1ZQ==", "base64");
    * console.log(base64); // true
    *
-   * const nested = NehonixURIProcessor.decode("414243", "hex", 2);
+   * const nested = StruLink.decode("414243", "hex", 2);
    * console.log(nested); // ABC
    * ```
    */
@@ -247,21 +247,21 @@ class NehonixURIProcessor {
    *
    * This method parses the provided URI string using the native `URL` API, returning a `URL` object that provides
    * structured access to the URL's components (e.g., protocol, hostname, pathname, search parameters). It is useful
-   * for further URL manipulation or analysis within the `NehonixURIProcessor` ecosystem.
+   * for further URL manipulation or analysis within the `StruLink` ecosystem.
    *
    * @param uri - The URI string to parse (e.g., `https://nehonix.space?test=true`).
    * @returns A `URL` object representing the parsed URI.
    * @throws Throws a `TypeError` if the URI string is invalid or cannot be parsed by the `URL` constructor.
    * @example
    * ```typescript
-   * const urlObj = NehonixURIProcessor.createUrl("https://nehonix.space?test=true");
+   * const urlObj = StruLink.createUrl("https://nehonix.space?test=true");
    * console.log(urlObj.href); // https://nehonix.space?test=true
    * console.log(urlObj.hostname); // nehonix.space
    * console.log(urlObj.searchParams.get("test")); // true
    *
    * // Handling invalid URI
    * try {
-   *   const invalidUrl = NehonixURIProcessor.createUrl("not-a-valid-url");
+   *   const invalidUrl = StruLink.createUrl("not-a-valid-url");
    * } catch (error) {
    *   console.log(error.message); // Failed to construct 'URL': Invalid URL
    * }
@@ -312,7 +312,7 @@ class NehonixURIProcessor {
    * @throws Does not throw errors; instead, parsing errors are reported in the `validationDetails.parsing` property.
    * @example
    * ```typescript
-   * const result = NehonixURIProcessor.checkUrl("https://nehonix.space?test=true");
+   * const result = StruLink.checkUrl("https://nehonix.space?test=true");
    * console.log(result);
    * // Output: {
    * //   isValid: true,
@@ -325,7 +325,7 @@ class NehonixURIProcessor {
    * // }
    *
    * // Invalid URL with unencoded spaces
-   * const invalidResult = NehonixURIProcessor.checkUrl("https://nehonix.space?test=thank you");
+   * const invalidResult = StruLink.checkUrl("https://nehonix.space?test=thank you");
    * console.log(invalidResult);
    * // Output: {
    * //   isValid: false,
@@ -338,7 +338,7 @@ class NehonixURIProcessor {
    * // }
    *
    * // URL with duplicate parameters
-   * const duplicateResult = NehonixURIProcessor.checkUrl(
+   * const duplicateResult = StruLink.checkUrl(
    *   "https://nehonix.space?p1=a&p1=b",
    *   { rejectDuplicateParams: true }
    * );
@@ -352,7 +352,7 @@ class NehonixURIProcessor {
    * // }
    *
    * // URL with strict encoding violation
-   * const encodingResult = NehonixURIProcessor.checkUrl(
+   * const encodingResult = StruLink.checkUrl(
    *   "https://nehonix.space?test=%25",
    *   { strictParamEncoding: true }
    * );
@@ -464,7 +464,7 @@ class NehonixURIProcessor {
   }
 }
 
-export { NehonixURIProcessor };
+export { StruLink };
 //v2
 export { MaliciousPatternType } from "./services/MaliciousPatterns.service";
 export type { MaliciousPatternResult } from "./services/MaliciousPatterns.service";
@@ -478,22 +478,13 @@ export type { MaliciousPatternResult } from "./services/MaliciousPatterns.servic
  * @returns The appropriately encoded string
  */
 export const __safeEncode__ = NehonixSafetyLayer.__safeEncode__;
-export { NehonixURIProcessor as __processor__ };
+export { StruLink as __processor__ };
 export const decodeB64 = (input: string) =>
   NDS.decode({
     input,
     encodingType: "base64",
   });
 
-//v2.3.x
-export * from "./integration/react/hook/REACT.ShieldHooks";
-export * from "./integration/react/provider/REACT.NehonixShield";
-export * from "./integration/react/hook/REACT.NehonixDomPlugging.hooks";
-export * from "./integration/express/Middleware/exports/EXPRESS.exports";
+//v2.3.x - Integration exports removed (Express/React)
 export { DetectedPattern } from "./services/MaliciousPatterns.service";
 export const { detectDuplicatedValues: detectDuplicateUrlParams } = ncu;
-
-//v2.4.x
-export * from "./shield/Core/NSHParser";
-export * from "./shield/Core/NehonixShield";
-export * from "./shield/Core/types/ShieldTypes";

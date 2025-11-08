@@ -1,13 +1,13 @@
-# NehonixURIProcessor v2.1.2
+# StruLink v2.1.2
 
-A comprehensive TypeScript library for detecting, decoding, and encoding various URI encoding schemes. Designed for security testing, web application penetration testing, and analyzing potential attacks, `NehonixURIProcessor` offers powerful auto-detection, decoding, and validation capabilities.
+A comprehensive TypeScript library for detecting, decoding, and encoding various URI encoding schemes. Designed for security testing, web application penetration testing, and analyzing potential attacks, `StruLink` offers powerful auto-detection, decoding, and validation capabilities.
 
 **Version**: 2.1.2  
 **License**: MIT
 
 ## Overview
 
-The `NehonixURIProcessor` class provides methods to:
+The `StruLink` class provides methods to:
 
 - Validate URIs with configurable rules, including custom properties (`checkUrl`).
 - Automatically detect and decode encoded URIs to plaintext (`autoDetectAndDecode`).
@@ -21,7 +21,7 @@ Version 2.1.2 includes performance improvements, enhanced encoding detection alg
 ## Installation
 
 ```bash
-npm i nehonix-uri-processor
+npm i strulink
 ```
 
 Install the `punycode` dependency:
@@ -65,7 +65,7 @@ Automatically detects and decodes a URI string to plaintext, handling complex an
 **Example**:
 
 ```typescript
-const decoded = NehonixURIProcessor.autoDetectAndDecode(
+const decoded = StruLink.autoDetectAndDecode(
   "https://example.com?param=dHJ1ZQ=="
 );
 console.log(decoded.val()); // https://example.com?param=true
@@ -90,7 +90,7 @@ Performs comprehensive validation of a URL string against configurable rules, re
 **Example**:
 
 ```typescript
-const result = NehonixURIProcessor.checkUrl("https://example.com?test=value", {
+const result = StruLink.checkUrl("https://example.com?test=value", {
   httpsOnly: true,
   strictParamEncoding: true,
 });

@@ -1,4 +1,4 @@
-# NehonixURIProcessor
+# StruLink
 
 A comprehensive TypeScript library for detecting, decoding, and encoding various URI encoding schemes. This utility is designed for security testing, web application penetration testing, and analyzing potential attacks, with powerful auto-detection and decoding capabilities.
 See full documentation at [lab.nehonix.space](https://lab.nehonix.space)
@@ -18,7 +18,7 @@ See full documentation at [lab.nehonix.space](https://lab.nehonix.space)
 
 ## Overview
 
-The `NehonixURIProcessor` class provides methods to:
+The `StruLink` class provides methods to:
 
 - Validate URIs with configurable rules
 - Automatically detect and decode encoding types in URIs with the recommended `autoDetectAndDecode` method
@@ -30,7 +30,7 @@ The `NehonixURIProcessor` class provides methods to:
 ## Installation
 
 ```bash
-npm i nehonix-uri-processor
+npm i strulink
 ```
 
 Make sure to also install the `punycode` dependency:
@@ -42,27 +42,27 @@ npm install punycode
 ## Usage
 
 ```typescript
-import { NehonixURIProcessor } from "nehonix-uri-processor";
+import { StruLink } from "strulink";
 
 // Validate a URI
-const isValid = NehonixURIProcessor.isValidUri("https://example.com?test=true");
+const isValid = StruLink.isValidUri("https://example.com?test=true");
 console.log(isValid); // true
 
 // Recommended: Automatically detect and decode with autoDetectAndDecode
 const encodedURL = "https://example.com/page?param=dHJ1ZQ==";
-const decoded = NehonixURIProcessor.autoDetectAndDecode(encodedURL);
+const decoded = StruLink.autoDetectAndDecode(encodedURL);
 console.log(decoded); // https://example.com/page?param=true
 
 // Encode a string using a specific encoding type
-const encoded = NehonixURIProcessor.encode("hello world", "rot13");
+const encoded = StruLink.encode("hello world", "rot13");
 console.log(encoded); // uryyb jbeyq
 
 // Generate WAF bypass variants
-const variants = NehonixURIProcessor.generateWAFBypassVariants("<script>");
+const variants = StruLink.generateWAFBypassVariants("<script>");
 console.log(variants); // { percent: "%3Cscript%3E", base64: "PHNjcmlwdD4=", ... }
 
 // Create a URL object
-const urlObj = NehonixURIProcessor.createUrl("https://example.com");
+const urlObj = StruLink.createUrl("https://example.com");
 console.log(urlObj.href); // https://example.com/
 ```
 
@@ -99,15 +99,12 @@ Checks whether a string is a valid URI with configurable validation rules.
 - **Example**:
 
   ```typescript
-  const isValid = NehonixURIProcessor.isValidUri(
-    "https://example.com?test=thank%20you",
-    { httpsOnly: true }
-  );
+  const isValid = StruLink.isValidUri("https://example.com?test=thank%20you", {
+    httpsOnly: true,
+  });
   console.log(isValid); // true
 
-  const isInvalid = NehonixURIProcessor.isValidUri(
-    "https://example.com?test=thank you"
-  );
+  const isInvalid = StruLink.isValidUri("https://example.com?test=thank you");
   console.log(isInvalid); // false (unencoded space)
   ```
 
@@ -121,9 +118,7 @@ Creates a `URL` object from a URI string.
 
 - **Example**:
   ```typescript
-  const url = NehonixURIProcessor.createUrl(
-    "https://example.com/path?query=test"
-  );
+  const url = StruLink.createUrl("https://example.com/path?query=test");
   console.log(url.pathname); // /path
   console.log(url.search); // ?query=test
   ```
@@ -145,7 +140,7 @@ Detects the encoding type(s) of a URI string, with optional recursion for nested
 
 - **Example**:
   ```typescript
-  const detection = NehonixURIProcessor.detectEncoding("hello%20world");
+  const detection = StruLink.detectEncoding("hello%20world");
   console.log(detection); // { mostLikely: "percentEncoding", confidence: 0.95, nestedTypes: [] }
   ```
 
@@ -162,7 +157,7 @@ Detects the encoding type(s) of a URI string, with optional recursion for nested
 
 - **Example**:
   ```typescript
-  const decoded = NehonixURIProcessor.autoDetectAndDecode(
+  const decoded = StruLink.autoDetectAndDecode(
     "https://example.com?test=dHJ1ZQ=="
   );
   console.log(decoded); // https://example.com?test=true
@@ -184,7 +179,7 @@ Automatically detects and decodes a URI string.
 
 - **Example**:
   ```typescript
-  const result = NehonixURIProcessor.detectAndDecode("dHJ1ZQ==");
+  const result = StruLink.detectAndDecode("dHJ1ZQ==");
   console.log(result); // { val: "true", encodingType: "base64", confidence: 0.9 }
   ```
 
@@ -201,7 +196,7 @@ Encodes a string using a specific encoding type.
 
 - **Example**:
   ```typescript
-  const encoded = NehonixURIProcessor.encode("hello world", "rot13");
+  const encoded = StruLink.encode("hello world", "rot13");
   console.log(encoded); // uryyb jbeyq
   ```
 
@@ -219,7 +214,7 @@ Decodes a string using a specific encoding type, with optional recursion for nes
 
 - **Example**:
   ```typescript
-  const decoded = NehonixURIProcessor.decode("uryyb%20jbeyq", "rot13");
+  const decoded = StruLink.decode("uryyb%20jbeyq", "rot13");
   console.log(decoded); // hello%20world
   ```
 
@@ -236,9 +231,7 @@ Analyzes a URL and identifies potentially vulnerable parameters.
 
 - **Example**:
   ```typescript
-  const analysis = NehonixURIProcessor.analyzeURL(
-    "https://example.com?user=admin"
-  );
+  const analysis = StruLink.analyzeURL("https://example.com?user=admin");
   console.log(analysis); // { url: "https://example.com", params: { user: { value: "admin", risks: ["sql_injection", "xss"] } }, ... }
   ```
 
@@ -252,7 +245,7 @@ Generates various encoded versions of a string for WAF bypass testing.
 
 - **Example**:
   ```typescript
-  const variants = NehonixURIProcessor.generateWAFBypassVariants("<script>");
+  const variants = StruLink.generateWAFBypassVariants("<script>");
   console.log(variants); // { percent: "%3Cscript%3E", base64: "PHNjcmlwdD4=", rot13: "<fpevcg>", ... }
   ```
 

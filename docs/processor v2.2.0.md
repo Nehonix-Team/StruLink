@@ -1,10 +1,10 @@
-# NehonixURIProcessor
+# StruLink
 
 A comprehensive TypeScript library for detecting, decoding, and encoding various URI encoding schemes. This utility is designed for security testing, web application penetration testing, and analyzing potential attacks, with powerful auto-detection and decoding capabilities.
 
 **Version**: 2.2.0  
 **License**: MIT  
-**Documentation**: [lab.nehonix.space](https://lab.nehonix.space/nehonix_viewer/_doc/NehonixUriProcessor/readme)
+**Documentation**: [lab.nehonix.space](https://lab.nehonix.space/nehonix_viewer/_doc/StruLink/readme)
 
 ## Table of Contents
 
@@ -37,17 +37,17 @@ A comprehensive TypeScript library for detecting, decoding, and encoding various
 
 ## Introduction
 
-`NehonixURIProcessor` is a powerful TypeScript library for developers and security professionals. It provides advanced tools for URI validation, encoding/decoding, and security analysis. For convenience, you can import it as `__processor__` to shorten the name (both are the same):
+`StruLink` is a powerful TypeScript library for developers and security professionals. It provides advanced tools for URI validation, encoding/decoding, and security analysis. For convenience, you can import it as `__processor__` to shorten the name (both are the same):
 
 ```typescript
-import { NehonixURIProcessor } from "nehonix-uri-processor";
+import { StruLink } from "strulink";
 ` OR`;
-import { __processor__ } from "nehonix-uri-processor";
+import { __processor__ } from "strulink";
 ```
 
 ## Overview
 
-The `NehonixURIProcessor` class offers:
+The `StruLink` class offers:
 
 - **URI Validation**: Validate URIs with customizable rules and malicious pattern detection.
 - **Auto-Detection and Decoding**: Decode complex URI encodings using `autoDetectAndDecode` or `asyncAutoDetectAndDecode`.
@@ -61,7 +61,7 @@ The `NehonixURIProcessor` class offers:
 Install the library and its dependency:
 
 ```bash
-npm install nehonix-uri-processor punycode
+npm install strulink punycode
 ```
 
 ## Usage
@@ -69,10 +69,7 @@ npm install nehonix-uri-processor punycode
 Below are examples showcasing key features:
 
 ```typescript
-import {
-  NehonixURIProcessor as __processor__,
-  MaliciousPatternType,
-} from "nehonix-uri-processor";
+import { StruLink as __processor__, MaliciousPatternType } from "strulink";
 
 async function main() {
   // Validate a URI with malicious pattern detection
@@ -442,7 +439,7 @@ Both `checkUrl` and `asyncCheckUrl` validate URIs, but their execution models an
 ### Validating with checkUrl
 
 ````typescript
-import { __processor__ } from "nehonix-uri-processor";
+import { __processor__ } from "strulink";
 
 const result = __processor__.checkUrl("https://google.com/api", {
   literalValue: "nehonix.space",
@@ -645,7 +642,7 @@ Validate and decode URIs in Express applications.
 
 ```typescript
 import express from "express";
-import { nehonixShieldMiddleware } from "nehonix-uri-processor";
+import { nehonixShieldMiddleware } from "strulink";
 
 const app = express();
 app.use(nehonixShieldMiddleware({ blockOnMalicious: true }));
@@ -660,7 +657,7 @@ Validate and decode URIs in React applications.
 - **Usage**:
 
 ```typescript
-import { NehonixShieldProvider, useNehonixShield } from "nehonix-uri-processor";
+import { NehonixShieldProvider, useNehonixShield } from "strulink";
 
 const App = () => (
   <NehonixShieldProvider>

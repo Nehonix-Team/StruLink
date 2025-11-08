@@ -1,7 +1,8 @@
 {
-  "name": "nehonix-uri-processor",
+  "name": "strulink",
   "version": "2.3.17",
-  "description": "A powerful URI processor for encoding, decoding, and analyzing URI data securely.",
+  "type": "module",
+  "description": "A focused TypeScript library for URL/URI encoding, decoding, validation, and analysis utilities.",
   "main": "./dist/index.cjs",
   "module": "./dist/index.esm.js",
   "types": "./dist/index.d.ts",
@@ -22,25 +23,19 @@
   "keywords": [
     "uri",
     "url",
-    "validation",
-    "decoding",
     "encoding",
-    "security",
+    "decoding",
+    "validation",
+    "url-utils",
+    "uri-utils",
     "typescript",
-    "webdev",
-    "pentesting",
-    "waf-bypass",
-    "cybersecurity",
-    "js",
-    "ts",
-    "uri-analysis",
-    "web-security",
-    "attack-detection",
-    "vulnerability-assessment",
-    "secure-coding",
-    "uri-parsing",
-    "machine-learning",
-    "threat-detection"
+    "url-parser",
+    "uri-parser",
+    "base64",
+    "percent-encoding",
+    "punycode",
+    "url-encoding",
+    "uri-encoding"
   ],
   "scripts": {
     "build": "rollup -c",
@@ -50,20 +45,14 @@
     "test": "jest",
     "patch": "npm version patch && npm publish",
     "minor": "npm version minor && npm publish",
-    "major": "npm version major && npm publish",
-    "serve": "ts-node ./src/tests/express.test.js",
-    "train": "bun ./src/tests/train_model.ts"
+    "major": "npm version major && npm publish"
   },
   "sideEffects": false,
   "devDependencies": {
     "@rollup/plugin-commonjs": "^28.0.3",
     "@rollup/plugin-node-resolve": "^16.0.1",
     "@rollup/plugin-typescript": "^12.1.2",
-    "@types/density-clustering": "^1.3.3",
-    "@types/express": "^5.0.1",
     "@types/node": "^22.14.1",
-    "@types/pg": "^8.11.14",
-    "@types/react": "^18.2.15",
     "rollup": "^4.40.0",
     "rollup-plugin-dts": "^6.2.1",
     "ts-node": "^10.9.2",
@@ -71,7 +60,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/nehonix/nehonixUriProcessor.git"
+    "url": "https://github.com/Nehonix-Team/StruLink.git"
   },
   "license": "MIT",
   "engines": {
@@ -83,26 +72,7 @@
     "url": "https://nehonix.space"
   },
   "dependencies": {
-    "axios": "^1.9.0",
     "chalk": "^5.4.1",
-    "child_process": "^1.0.2",
-    "density-clustering": "^1.3.0",
-    "express": "^5.1.0",
-    "idna-uts46-hx": "^6.0.8",
-    "ip-range-check": "^0.2.0",
-    "limiter": "^3.0.0",
-    "ml": "^8.0.0",
-    "ml.js": "^0.0.1",
-    "pg": "^8.15.6",
-    "react": "^19.1.0"
-  },
-  "browserslist": [
-    "> 1%",
-    "last 2 versions",
-    "not dead"
-  ],
-  "peerDependencies": {
-    "express": "^5.1.0",
-    "react": "^19.1.0"
+    "idna-uts46-hx": "^6.0.8"
   }
 }

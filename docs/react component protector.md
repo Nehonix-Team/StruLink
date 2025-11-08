@@ -17,7 +17,7 @@ The NSB DOM & Request Analysis feature enhances web application security by addi
 Wrap your application in the `NehonixShieldProvider` to enable security features:
 
 ```jsx
-import { NehonixShieldProvider } from "nehonix-uri-processor";
+import { NehonixShieldProvider } from "strulink";
 
 function App() {
   return (
@@ -116,7 +116,7 @@ Props:
 The `useNehonixShield` hook provides access to security features within functional components:
 
 ```jsx
-import { useNehonixShield } from "nehonix-uri-processor";
+import { useNehonixShield } from "strulink";
 
 function SecureComponent() {
   const {
@@ -156,7 +156,7 @@ function SecureComponent() {
 Use the `withDomAnalysis` HOC to add automatic DOM analysis to any component:
 
 ```jsx
-import { withDomAnalysis } from "nehonix-uri-processor";
+import { withDomAnalysis } from "strulink";
 
 function UserContent({ nsbIsAnalyzing, nsbAnalysisResult, ...props }) {
   // The HOC injects these props

@@ -2,7 +2,7 @@
 
 ## Supported Versions
 
-The following versions of NehonixURIProcessor are currently being supported with security updates:
+The following versions of StruLink are currently being supported with security updates:
 
 | Version | Supported          |
 | ------- | ------------------ |
@@ -13,11 +13,11 @@ The following versions of NehonixURIProcessor are currently being supported with
 
 ## Reporting a Vulnerability
 
-We take the security of NehonixURIProcessor seriously. This library is designed for security testing and protection against URI-based attacks, so maintaining its integrity is our highest priority.
+We take the security of StruLink seriously. This library is designed for security testing and protection against URI-based attacks, so maintaining its integrity is our highest priority.
 
 ### How to Report
 
-If you discover a security vulnerability within NehonixURIProcessor, please follow these steps:
+If you discover a security vulnerability within StruLink, please follow these steps:
 
 1. **Do not disclose the vulnerability publicly** until it has been addressed by our team
 2. Include detailed information about the vulnerability:
@@ -29,6 +29,7 @@ If you discover a security vulnerability within NehonixURIProcessor, please foll
      [Report now](https://forms.gle/VwP2mQHFR8VrrQp39)
 
 ---
+
 Direct link to google form
 https://forms.gle/VwP2mQHFR8VrrQp39
 
@@ -41,7 +42,7 @@ https://forms.gle/VwP2mQHFR8VrrQp39
 
 ## Security Best Practices
 
-When implementing NehonixURIProcessor in your applications, we recommend the following security practices:
+When implementing StruLink in your applications, we recommend the following security practices:
 
 1. **Always use the latest version** to benefit from security patches and improvements
 2. **Implement proper input validation** in addition to using this library
@@ -51,7 +52,7 @@ When implementing NehonixURIProcessor in your applications, we recommend the fol
 
 ## Security Features
 
-NehonixURIProcessor includes several security-focused features:
+StruLink includes several security-focused features:
 
 - Parameter analysis for common injection patterns (SQL injection, XSS, path traversal)
 - WAF bypass detection with mixed encoding strategies
@@ -64,4 +65,4 @@ We follow responsible disclosure principles and expect the same from security re
 
 ---
 
-Thank you for helping keep NehonixURIProcessor secure!
+Thank you for helping keep StruLink secure!

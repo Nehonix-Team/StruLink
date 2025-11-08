@@ -1,4 +1,4 @@
-import { NehonixURIProcessor } from "..";
+import { StruLink } from "..";
 import {
   DetectedPattern,
   MaliciousPatternOptions,
@@ -7,7 +7,7 @@ import {
 
 /**
  * Supported encoding types. This enumeration defines all the encoding schemes
- * that the NehonixURIProcessor can handle. Each type represents a distinct
+ * that the StruLink can handle. Each type represents a distinct
  * method of representing characters or data in a string format, often used
  * in URLs, web applications, and data transmission.
  */
@@ -189,12 +189,12 @@ export interface DecodeResult {
 }
 
 /**
- * Interface for the NehonixURIProcessor class. This interface defines the
- * public methods and properties available in the NehonixURIProcessor class,
+ * Interface for the StruLink class. This interface defines the
+ * public methods and properties available in the StruLink class,
  * which provides functionality for encoding and decoding strings, analyzing
  * URLs, and generating WAF bypass variants.
  */
-export interface INehonixURIProcessor {
+export interface IStruLink {
   /**
    * Automatically detects and decodes a URI based on the detected encoding type.
    * @param input The URI string to decode.
@@ -381,7 +381,7 @@ export interface INehonixURIProcessor {
 }
 
 // Implementation type for the static class
-export type NehonixURIProcessorType = typeof NehonixURIProcessor;
+export type StruLinkType = typeof StruLink;
 
 /**
  *Real-world application: Encoding user input for various contexts (RWA)

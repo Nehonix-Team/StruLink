@@ -1,13 +1,13 @@
-# NehonixURIProcessor
+# StruLink
 
-A comprehensive TypeScript library for detecting, decoding, and encoding various URI encoding schemes. Designed for security testing, web application penetration testing, and analyzing potential attacks, `NehonixURIProcessor` offers powerful auto-detection, decoding, and validation capabilities.
+A comprehensive TypeScript library for detecting, decoding, and encoding various URI encoding schemes. Designed for security testing, web application penetration testing, and analyzing potential attacks, `StruLink` offers powerful auto-detection, decoding, and validation capabilities.
 
 **Version**: 2.0.9  
 **License**: MIT
 
 ## Overview
 
-The `NehonixURIProcessor` class provides methods to:
+The `StruLink` class provides methods to:
 
 - Validate URIs with configurable rules, including custom properties (`checkUrl`).
 - Automatically detect and decode encoded URIs to plaintext (`autoDetectAndDecode`).
@@ -21,7 +21,7 @@ This README focuses on the `autoDetectAndDecode`, `analyzeURL`, and `checkUrl` m
 ## Installation
 
 ```bash
-npm i nehonix-uri-processor
+npm i strulink
 ```
 
 Install the `punycode` dependency:
@@ -54,18 +54,16 @@ Automatically detects and decodes a URI string to plaintext, handling complex an
 **Example**:
 
 ```typescript
-import { NehonixURIProcessor } from "nehonix-uri-processor";
+import { StruLink } from "strulink";
 
 // Decode a Base64-encoded query parameter
-const decoded = NehonixURIProcessor.autoDetectAndDecode(
+const decoded = StruLink.autoDetectAndDecode(
   "https://example.com?test=dHJ1ZQ=="
 );
 console.log(decoded); // https://example.com?test=true
 
 // Decode a nested encoding
-const nested = NehonixURIProcessor.autoDetectAndDecode(
-  "aHR0cHM6Ly9leGFtcGxlLmNvbQ=="
-);
+const nested = StruLink.autoDetectAndDecode("aHR0cHM6Ly9leGFtcGxlLmNvbQ==");
 console.log(nested); // https://example.com
 ```
 
@@ -99,11 +97,9 @@ An object containing:
 **Example**:
 
 ```typescript
-import { NehonixURIProcessor } from "nehonix-uri-processor";
+import { StruLink } from "strulink";
 
-const analysis = NehonixURIProcessor.analyzeURL(
-  "https://example.com?user=admin&pass=123"
-);
+const analysis = StruLink.analyzeURL("https://example.com?user=admin&pass=123");
 console.log(analysis);
 // Output:
 // {
@@ -157,10 +153,10 @@ The `fullCustomValidation` option (aliased as `fcv`) allows users to define cust
 **Example**:
 
 ```typescript
-import { NehonixURIProcessor } from "nehonix-uri-processor";
+import { StruLink } from "strulink";
 
 // Validate URL with custom properties
-const result = NehonixURIProcessor.checkUrl("https://google.com/api", {
+const result = StruLink.checkUrl("https://google.com/api", {
   literalValue: "7",
   debug: true,
   fullCustomValidation: {
@@ -199,9 +195,9 @@ console.log(result);
 **Example with `fcv` Alias**:
 
 ```typescript
-import { NehonixURIProcessor } from "nehonix-uri-processor";
+import { StruLink } from "strulink";
 
-const result = NehonixURIProcessor.checkUrl("https://google.com/api", {
+const result = StruLink.checkUrl("https://google.com/api", {
   literalValue: "7",
   debug: true,
   fullCustomValidation: {
@@ -243,15 +239,15 @@ console.log(result);
 ## Usage Example
 
 ```typescript
-import { NehonixURIProcessor } from "nehonix-uri-processor";
+import { StruLink } from "strulink";
 
 // Decode and validate a URL
 const encodedUrl = "https://example.com?data=dHJ1ZQ==";
-const decoded = NehonixURIProcessor.autoDetectAndDecode(encodedUrl);
+const decoded = StruLink.autoDetectAndDecode(encodedUrl);
 console.log(decoded); // https://example.com?data=true
 
 // Validate with custom properties
-const validation = NehonixURIProcessor.checkUrl(decoded, {
+const validation = StruLink.checkUrl(decoded, {
   httpsOnly: true,
   fullCustomValidation: { sessionId: "abc123" },
   customValidations: [["fcv.sessionId", "===", "abc123"]],
@@ -259,7 +255,7 @@ const validation = NehonixURIProcessor.checkUrl(decoded, {
 console.log(validation.isValid); // true
 
 // Analyze for vulnerabilities
-const analysis = NehonixURIProcessor.analyzeURL(decoded);
+const analysis = StruLink.analyzeURL(decoded);
 console.log(analysis.params);
 // Output: { data: { value: "true", risks: ["xss"] } }
 ```
@@ -307,7 +303,7 @@ The library supports the following encoding types for `autoDetectAndDecode`, `en
 ## See Also
 
 - [checkUrlMethod.md](./checkUrlMethod.md) - Detailed `checkUrl` reference.
-- NehonixURIProcessor documentation for other methods.
+- StruLink documentation for other methods.
 
 ## License
 
