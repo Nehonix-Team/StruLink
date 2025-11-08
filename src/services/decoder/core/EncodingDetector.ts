@@ -387,7 +387,7 @@ export class EncodingDetector {
 
     return {
       types,
-      mostLikely,
+      mostLikely: mostLikely as ENC_TYPE | "plainText" | "mixedEncoding",
       confidence: highestScore,
     };
   }

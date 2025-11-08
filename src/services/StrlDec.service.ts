@@ -44,7 +44,7 @@ class NDS {
     const detection = this.detectEncoding(input);
     const decoded = this.decode({
       input,
-      encodingType: detection.mostLikely,
+      encodingType: detection.mostLikely as ENC_TYPE,
     });
 
     return {

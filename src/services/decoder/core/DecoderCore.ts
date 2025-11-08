@@ -70,7 +70,7 @@ export class DecoderCore {
       try {
         const decoded = this.decode({
           input: currentInput,
-          encodingType: detection.mostLikely,
+          encodingType: detection.mostLikely === "plainText" || detection.mostLikely === "mixedEncoding" ? detection.mostLikely : detection.mostLikely as ENC_TYPE,
         });
 
         if (decoded === currentInput) {
@@ -130,7 +130,7 @@ export class DecoderCore {
     if (nestedDetection.isNested) {
       return this.decodeAnyToPlaintext(input, {
         maxIterations: 5,
-      }).val();
+      }).val!();
     }
 
     return this.decode({
@@ -170,7 +170,7 @@ export class DecoderCore {
         NehonixSharedUtils
       );
       if (detection.mostLikely !== "plainText" && detection.confidence > 0.7) {
-        return this.decodeSingle(decoded, detection.mostLikely, depth + 1);
+        return this.decodeSingle(decoded, detection.mostLikely as ENC_TYPE, depth + 1);
       }
 
       return decoded;
@@ -208,7 +208,7 @@ export class DecoderCore {
     try {
       const decoded = this.decode({
         input,
-        encodingType: initialDetection.mostLikely,
+        encodingType: initialDetection.mostLikely as ENC_TYPE,
       });
 
       if (decoded === input) {
@@ -270,7 +270,7 @@ export class DecoderCore {
       if (encodingType === "any") {
         return this.decodeAnyToPlaintext(input, {
           maxIterations: 5,
-        }).val();
+        }).val!();
       }
 
       // Special case: URLs with parameters

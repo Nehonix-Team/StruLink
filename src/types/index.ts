@@ -169,20 +169,35 @@ export interface DecodeResult {
   /**
    * The decoded string value.
    */
-  val: () => string;
+  val?: () => string;
+  /**
+   * The decoded string (direct value).
+   */
+  decoded?: string;
+  /**
+   * The original input string.
+   */
+  original?: string;
   /**
    * The detected encoding type of the input string.
    */
-  encodingType: string;
+  encodingType?: string;
+  /**
+   * The detected encoding type (alternative name).
+   */
+  encoding?: string;
   /**
    * A numerical value representing the confidence level of the encoding detection.
    */
-  confidence: number;
+  confidence?: number;
+  /**
+   * Indicates if nested encoding was detected.
+   */
+  nested?: boolean;
   /**
    * If nested encoding is detected, this array lists the inner encoding types.
    */
   nestedTypes?: string[];
-  original?: string;
   attemptedDecode?: string;
   attemptedVal?: string | undefined;
   decodingHistory?: { result: string; type: string; confidence: number }[];
@@ -932,4 +947,21 @@ export interface UriHandlerInterface {
   output?: {
     encodeUrl?: boolean;
   };
+  /**
+   * Get the final decoded value.
+   */
+  val?: () => string;
+  /**
+   * Get the decoding steps.
+   */
+  steps?: () => Array<{
+    step: number;
+    encoding: string;
+    decoded: string;
+    confidence: number;
+  }>;
+  /**
+   * Get the number of iterations performed.
+   */
+  iterations?: () => number;
 }
