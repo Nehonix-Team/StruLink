@@ -1,7 +1,7 @@
 /**
  * Decoder Core Module
  * Main orchestration logic for decoding operations
- * 
+ *
  * Handles:
  * - Main decode method
  * - Smart decode (auto-detection)
@@ -9,7 +9,11 @@
  * - Any-to-plaintext (iterative)
  */
 
-import { ENC_TYPE, DEC_FEATURE_TYPE, UriHandlerInterface } from "../../../types";
+import {
+  ENC_TYPE,
+  DEC_FEATURE_TYPE,
+  UriHandlerInterface,
+} from "../../../types";
 import { NehonixSharedUtils } from "../../../common/StrlCommonUtils";
 import { AppLogger } from "../../../common/AppLogger";
 import { EncodingDetector } from "./EncodingDetector.v2";
@@ -68,11 +72,6 @@ export class DecoderCore {
       }
 
       try {
-        // Skip if it's plainText
-        if (detection.mostLikely === "plainText") {
-          break;
-        }
-
         // Handle mixed encoding specially
         if (detection.mostLikely === "mixedEncoding") {
           const decoded = PartialDecoder.decodeMixed(currentInput);
@@ -197,7 +196,11 @@ export class DecoderCore {
         NehonixSharedUtils
       );
       if (detection.mostLikely !== "plainText" && detection.confidence > 0.7) {
-        return this.decodeSingle(decoded, detection.mostLikely as ENC_TYPE, depth + 1);
+        return this.decodeSingle(
+          decoded,
+          detection.mostLikely as ENC_TYPE,
+          depth + 1
+        );
       }
 
       return decoded;

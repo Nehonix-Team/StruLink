@@ -949,10 +949,22 @@ export interface UriHandlerInterface {
   };
   /**
    * Get the final decoded value.
+   * @returns The decoded value.
+   * @example
+   * ```typescript
+   * const decoded = StruLink.autoDetectAndDecode("https://nehonix.space?test=dHJ1ZQ==");
+   * console.log(decoded.val()); // https://nehonix.space?test=true
+   * ```
    */
-  val?: () => string;
+  val: () => string;
   /**
    * Get the decoding steps.
+   * @returns An array of decoding steps.
+   * @example
+   * ```typescript
+   * const decoded = StruLink.autoDetectAndDecode("https://nehonix.space?test=dHJ1ZQ==");
+   * console.log(decoded.steps()); // [{ step: 1, encoding: "base64", decoded: "true", confidence: 1 }]
+   * ```
    */
   steps?: () => Array<{
     step: number;
@@ -962,6 +974,12 @@ export interface UriHandlerInterface {
   }>;
   /**
    * Get the number of iterations performed.
+   * @returns The number of iterations performed.
+   * @example
+   * ```typescript
+   * const decoded = StruLink.autoDetectAndDecode("https://nehonix.space?test=dHJ1ZQ==");
+   * console.log(decoded.iterations()); // 1
+   * ```
    */
   iterations?: () => number;
 }

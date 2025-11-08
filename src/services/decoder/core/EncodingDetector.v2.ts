@@ -361,13 +361,13 @@ export class EncodingDetector {
       };
     }
 
-    let mostLikely = types[0];
-    let highestScore = detectionScores[mostLikely];
+    let mostLikely: ENC_TYPE | "plainText" | "mixedEncoding" = types[0] as ENC_TYPE | "plainText" | "mixedEncoding";
+    let highestScore = detectionScores[types[0]];
 
     for (const type of types) {
       if (detectionScores[type] > highestScore) {
         highestScore = detectionScores[type];
-        mostLikely = type;
+        mostLikely = type as ENC_TYPE | "plainText" | "mixedEncoding";
       }
     }
 
