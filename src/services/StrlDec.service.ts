@@ -610,7 +610,27 @@ class NDS {
         score: 0.93,
         minLength: 4,
       },
-      { type: "base32", fn: utils.isBase32, score: 0.88, minLength: 8 },
+      { 
+        type: "base32", 
+        fn: utils.isBase32, 
+        score: 0.91, 
+        minLength: 8,
+        partialDetectionFn: (s: string) => {
+          // Base32 uses A-Z and 2-7, often with = padding
+          const base32Pattern = /^[A-Z2-7]+=*$/;
+          const isPureBase32 = base32Pattern.test(s);
+          
+          // Check for = padding which is characteristic of base32
+          const hasPadding = s.endsWith('=');
+          
+          if (isPureBase32 && s.length >= 8) {
+            // Boost confidence for strings that look like base32
+            return { isPartial: false, ratio: 1.0 };
+          }
+          
+          return { isPartial: false, ratio: 0 };
+        },
+      },
       { type: "asciihex", fn: utils.isAsciiHex, score: 0.85 },
       { type: "asciioct", fn: utils.isAsciiOct, score: 0.85 },
       {
@@ -698,7 +718,34 @@ class NDS {
       { type: "decimalHtmlEntity", fn: utils.isDecimalHtmlEntity, score: 0.83 },
       { type: "quotedPrintable", fn: utils.isQuotedPrintable, score: 0.77 },
       { type: "punycode", fn: utils.isPunycode, score: 0.9 },
-      { type: "rot13", fn: utils.isRot13.bind(utils), score: 0.9 },
+      { 
+        type: "rot13", 
+        fn: utils.isRot13.bind(utils), 
+        score: 0.75,
+        partialDetectionFn: (s: string) => {
+          // ROT13 only affects letters, numbers stay the same
+          // It's hard to detect without context, so lower priority
+          const hasOnlyLetters = /^[a-zA-Z]+$/.test(s);
+          
+          if (hasOnlyLetters && s.length >= 4) {
+            // Try decoding and see if it makes more sense
+            try {
+              const decoded = s.replace(/[a-zA-Z]/g, (c) => {
+                const code = c.charCodeAt(0);
+                const base = c <= 'Z' ? 65 : 97;
+                return String.fromCharCode(((code - base + 13) % 26) + base);
+              });
+              // Check if decoded has common English patterns
+              const commonWords = /\b(the|and|for|are|but|not|you|all|can|her|was|one|our|out|day)\b/i;
+              if (commonWords.test(decoded)) {
+                return { isPartial: false, ratio: 0.9 };
+              }
+            } catch {}
+          }
+          
+          return { isPartial: false, ratio: 0 };
+        },
+      },
       { type: "utf7", fn: utils.isUtf7, score: 0.75 },
       {
         type: "jsEscape",

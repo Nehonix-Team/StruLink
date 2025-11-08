@@ -24,7 +24,7 @@ if (hexText !== hexTextAutoDecode) {
 }
 
 console.log("============ TEST3: RAWHEX AUTO DECODE");
-const rawHexText = __strl__.encode("random", "rawHex");
+const rawHexText = __strl__.encode("random", "base32");
 console.log("rawHexText: ", rawHexText);
 const rawHexTextAutoDecode = __strl__.autoDetectAndDecode(rawHexText).val();
 console.log("rawHexTextAutoDecode: ", rawHexTextAutoDecode);
