@@ -218,15 +218,15 @@ This refactoring demonstrates how to safely break down a large monolithic class 
 
 ### File Size Reduction
 - **Before**: 2,344 lines
-- **After**: 504 lines
-- **Reduction**: 1,840 lines (78.5% smaller!) 🔥
+- **After**: 253 lines
+- **Reduction**: 2,091 lines (89.2% smaller!) 🔥🔥🔥
 
 ### Module Distribution
 - **Decoder Modules**: 467 lines (8 modules)
-- **Core Logic**: 660 lines (2 modules)
+- **Core Logic**: 1,430 lines (4 modules - EncodingDetector, PartialDecoder, DecoderCore)
 - **URL Processing**: 240 lines (2 modules)
-- **Main Service**: 805 lines (orchestrator)
-- **Total Modular Code**: 2,172 lines across 13 modules
+- **Main Service**: 253 lines (pure delegation)
+- **Total Modular Code**: 2,390 lines across 15 modules
 
 ### Test Results - ALL PASSING ✅
 - Decoder Modules: 21/21 (100%)
