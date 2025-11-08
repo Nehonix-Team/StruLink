@@ -70,7 +70,7 @@ export class DecoderCore {
       try {
         const decoded = this.decode({
           input: currentInput,
-          encodingType: detection.mostLikely === "plainText" || detection.mostLikely === "mixedEncoding" ? detection.mostLikely : detection.mostLikely as ENC_TYPE,
+          encodingType: detection.mostLikely as ENC_TYPE,
         });
 
         if (decoded === currentInput) {
@@ -135,7 +135,7 @@ export class DecoderCore {
 
     return this.decode({
       input,
-      encodingType: detection.mostLikely,
+      encodingType: detection.mostLikely as ENC_TYPE,
     });
   }
 
