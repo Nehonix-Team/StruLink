@@ -68,6 +68,28 @@ export class DecoderCore {
       }
 
       try {
+        // Skip if it's plainText
+        if (detection.mostLikely === "plainText") {
+          break;
+        }
+
+        // Handle mixed encoding specially
+        if (detection.mostLikely === "mixedEncoding") {
+          const decoded = PartialDecoder.decodeMixed(currentInput);
+          if (decoded === currentInput) {
+            break;
+          }
+          decodingSteps.push({
+            step: iteration + 1,
+            encoding: detection.mostLikely,
+            decoded,
+            confidence: detection.confidence,
+          });
+          currentInput = decoded;
+          iteration++;
+          continue;
+        }
+
         const decoded = this.decode({
           input: currentInput,
           encodingType: detection.mostLikely as ENC_TYPE,
@@ -131,6 +153,11 @@ export class DecoderCore {
       return this.decodeAnyToPlaintext(input, {
         maxIterations: 5,
       }).val!();
+    }
+
+    // Handle plainText case
+    if (detection.mostLikely === "plainText") {
+      return input;
     }
 
     return this.decode({
