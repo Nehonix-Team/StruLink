@@ -50,10 +50,12 @@ src/services/decoder/
 - ✅ EscapeDecoder.ts - JS escape, CSS escape, Quoted-Printable
 - ✅ SpecialDecoder.ts - ROT13, JWT, Punycode
 
-### Phase 2: Extract Core Logic (Priority: High)
-- ⏳ EncodingDetector.ts - Detection algorithms
-- ⏳ DecoderCore.ts - Main decode method
-- ⏳ PartialDecoder.ts - Partial decoding
+### Phase 2: Extract Core Logic (Priority: High) ⏳ In Progress
+- ⏳ EncodingDetector.ts - Detection algorithms (~400 lines extracted, integration pending)
+- ⏳ DecoderCore.ts - Main decode method (TODO)
+- ⏳ PartialDecoder.ts - Partial decoding (TODO)
+
+**Note**: Core modules have circular dependency challenges. Will integrate after resolving dependencies.
 
 ### Phase 3: Extract URL Processing (Priority: Medium)
 - ⏳ UrlParameterDecoder.ts
