@@ -28,22 +28,7 @@ class NDS {
     allowUnicodeEscapes: true,
     rejectDuplicateParams: false,
   };
-  // private static hasBase64Pattern = NehonixCoreUtils.hasBase64Pattern;
-  // // private static hasPercentEncoding = NehonixSharedUtils.hasPercentEncoding;
-  // private static enc: typeof NehonixEncService = NehonixEncService;
-  // private static hasDoublePercentEncoding =
-  //   NehonixCoreUtils.hasDoublePercentEncoding;
-  // private static hasHexEncoding = NehonixCoreUtils.hasHexEncoding;
-  // private static hasUnicodeEncoding = NehonixCoreUtils.hasUnicodeEncoding;
-  // private static hasRawHexString = NehonixCoreUtils.hasRawHexString;
-  // private static calculateBase64Confidence = NES.calculateBase64Confidence;
-  // private static hasHTMLEntityEncoding = NehonixCoreUtils.hasHTMLEntityEncoding;
-  // private static hasJWTFormat = NehonixCoreUtils.hasJWTFormat;
-  // private static hasPunycode = NehonixCoreUtils.hasPunycode;
-  // private static decodeBase64 = NehonixCoreUtils.decodeB64;
-  // private static decodeRawHexWithoutPrefix = NehonixCoreUtils.drwp;
-  // In your detectEncoding function or a new function
-  static detectMixedEncodings(input: string): string[] {
+   static detectMixedEncodings(input: string): string[] {
     const detectedEncodings = [];
 
     // Check for percent encoding
