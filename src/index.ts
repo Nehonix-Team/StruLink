@@ -1,6 +1,6 @@
 import NES, { NehonixEncService as enc } from "./services/StrlEnc.service";
 import { SecurityRules as sr } from "./rules/security.rules";
-import NDS, { NehonixDecService as dec } from "./services/NehonixDec.service";
+import NDS, { NehonixDecService as dec } from "./services/StrlDec.service";
 import { DEC_FEATURE_TYPE, ENC_TYPE } from "./types";
 import { ncu } from "./utils/NehonixCoreUtils";
 import NSS from "./services/NehonixSecurity.service";

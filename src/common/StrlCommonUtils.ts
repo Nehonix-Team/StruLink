@@ -1,4 +1,4 @@
-import NDS from "../services/NehonixDec.service";
+import NDS from "../services/StrlDec.service";
 import { AppLogger } from "./AppLogger";
 
 /**

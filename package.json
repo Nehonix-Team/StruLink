@@ -1,6 +1,6 @@
 {
   "name": "strulink",
-  "version": "2.3.17",
+  "version": "1.0.0",
   "type": "module",
   "module": "./dist/strulink.esm.js",
   "description": "A focused TypeScript library for URL/URI and String encoding, decoding, validation, and analysis utilities.",

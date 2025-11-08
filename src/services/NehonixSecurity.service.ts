@@ -10,7 +10,7 @@ import {
   ContextAnalysisResult,
   RelatedPatternGroup,
 } from "./MaliciousPatterns.service";
-import NDS from "./NehonixDec.service";
+import NDS from "./StrlDec.service";
 
 /**
  * Enhanced service for detecting various malicious patterns in URLs and general input

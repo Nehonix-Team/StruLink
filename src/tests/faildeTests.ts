@@ -1,6 +1,6 @@
 /*Manual testing failed tests */
 
-import NDS from "../services/NehonixDec.service";
+import NDS from "../services/StrlDec.service";
 
 function runTest() {
   function assertEqual(received: string, expected: string, name: string) {
