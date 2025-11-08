@@ -221,7 +221,7 @@ export interface TrainingDataPoint {
   url: string;
   features: URLFeatures;
   isMalicious: boolean;
-  detectedPatternTypes: MaliciousPatternType[];
+  detectedPatternTypes: MaliciousPatternType[]; 
   score: number;
   timestamp: number;
 }
