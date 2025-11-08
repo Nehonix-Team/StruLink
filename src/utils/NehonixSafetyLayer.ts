@@ -1,4 +1,4 @@
-import NES from "../services/NehonixEnc.service";
+import NES from "../services/StrlEnc.service";
 import { ENC_TYPE, RWA_TYPES } from "../types";
 
 export class NehonixSafetyLayer {

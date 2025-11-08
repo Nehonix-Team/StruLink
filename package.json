@@ -2,15 +2,15 @@
   "name": "strulink",
   "version": "2.3.17",
   "type": "module",
-  "description": "A focused TypeScript library for URL/URI encoding, decoding, validation, and analysis utilities.",
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.esm.js",
-  "types": "./dist/index.d.ts",
+  "module": "./dist/strulink.esm.js",
+  "description": "A focused TypeScript library for URL/URI and String encoding, decoding, validation, and analysis utilities.",
+  "main": "./dist/strulink.cjs",
+  "types": "./dist/strulink.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/index.esm.js",
-      "require": "./dist/index.cjs",
-      "types": "./dist/index.d.ts"
+      "import": "./dist/strulink.esm.js",
+      "require": "./dist/strulink.cjs",
+      "types": "./dist/strulink.d.ts"
     },
     "./package.json": "./package.json"
   },
@@ -72,7 +72,6 @@
     "url": "https://nehonix.space"
   },
   "dependencies": {
-    "chalk": "^5.4.1",
     "idna-uts46-hx": "^6.0.8"
   }
 }

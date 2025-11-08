@@ -3,7 +3,7 @@ import {
   DetectedPattern,
   MaliciousPatternOptions,
 } from "../services/MaliciousPatterns.service";
-import { NehonixEncService } from "../services/NehonixEnc.service";
+import { NehonixEncService } from "../services/StrlEnc.service";
 import NSS from "../services/NehonixSecurity.service";
 import { URLAnalysisResult, WAFBypassVariants } from "../types";
 import { MaliciousComponentType as malicious_component_type } from "../types/v2.2.0";

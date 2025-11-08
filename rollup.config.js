@@ -13,7 +13,7 @@ export default [
   {
     input: "src/index.ts",
     output: {
-      file: "dist/index.esm.js",
+      file: "dist/strulink.esm.js",
       format: "es",
       sourcemap: true,
       exports: "named",
@@ -32,7 +32,7 @@ export default [
   {
     input: "src/index.ts",
     output: {
-      file: "dist/index.cjs",
+      file: "dist/strulink.cjs",
       format: "cjs",
       sourcemap: true,
       exports: "auto", // Changed from "named" to "auto"
@@ -55,10 +55,9 @@ export default [
   {
     input: "src/index.ts",
     output: {
-      file: "dist/index.d.ts",
+      file: "dist/strulink.d.ts",
       format: "es",
     },
     plugins: [dts()],
-    external: ["strulink"],
   },
 ];

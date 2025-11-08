@@ -1,10 +1,21 @@
-import chalk from "chalk";
-
 type LogLevel = "error" | "warn" | "info" | "debug" | "verbose" | "silly";
 type LogType = "error" | "info" | "warn" | "debug" | "table" | "log";
 
-// Define allowed chalk colors more precisely
-type ChalkColorName = keyof typeof chalk;
+// ANSI color codes
+type ColorName = "red" | "green" | "yellow" | "blue" | "magenta" | "cyan" | "gray" | "white";
+
+const COLORS: Record<ColorName, string> = {
+  red: "\x1b[31m",
+  green: "\x1b[32m",
+  yellow: "\x1b[33m",
+  blue: "\x1b[34m",
+  magenta: "\x1b[35m",
+  cyan: "\x1b[36m",
+  gray: "\x1b[90m",
+  white: "\x1b[37m",
+};
+
+const RESET = "\x1b[0m";
 
 interface LoggerOptions {
   level?: LogLevel;
@@ -69,15 +80,11 @@ export class AppLogger {
   }
 
   /**
-   * Apply chalk color safely
+   * Apply ANSI color code
    */
-  private static applyColor(text: string, colorName: ChalkColorName): string {
-    // Make sure the color exists on chalk
-    if (typeof chalk[colorName] === "function") {
-      return (chalk[colorName] as any)(text);
-    }
-    // Fallback to no color
-    return text;
+  private static applyColor(text: string, colorName: ColorName): string {
+    const color = COLORS[colorName];
+    return color ? `${color}${text}${RESET}` : text;
   }
 
   /**
@@ -87,7 +94,7 @@ export class AppLogger {
     messages: any[];
     type: LogType;
     level: LogLevel;
-    colorName: ChalkColorName;
+    colorName: ColorName;
   }): void {
     // Check if this log should be shown based on level
     if (this.logLevels[props.level] > this.logLevels[this.currentLevel]) {
@@ -206,7 +213,7 @@ export class AppLogger {
       level: "verbose",
       colorName: "magenta",
     });
-  }
+  } 
 
   /**
    * Log detailed or silly debug information

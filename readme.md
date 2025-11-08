@@ -49,12 +49,12 @@ A focused TypeScript library for URL/URI encoding, decoding, validation, and par
 
 ## Introduction
 
-`StruLink` is a powerful TypeScript library for developers and security professionals. It provides advanced tools for URI validation, encoding/decoding, and security analysis. For convenience, you can import it as `__processor__` to shorten the name (both are the same):
+`StruLink` is a powerful TypeScript library for developers and security professionals. It provides advanced tools for URI and Strings validation, encoding/decoding, and security analysis. For convenience, you can import it as `__strl__` to shorten the name (both are the same):
 
 ```typescript
 import { StruLink } from "strulink";
 ` OR`;
-import { __processor__ } from "strulink";
+import { __strl__ } from "strulink";
 ```
 
 ## Overview
@@ -83,11 +83,11 @@ bun add strulink
 Below are examples showcasing key features:
 
 ```typescript
-import { StruLink as __processor__, MaliciousPatternType } from "strulink";
+import { StruLink as __strl__, MaliciousPatternType } from "strulink";
 
 async function main() {
   // Validate a URI with malicious pattern detection
-  const result = await __processor__.asyncCheckUrl(
+  const result = await __strl__.asyncCheckUrl(
     "https://example.com?user=admin' OR '1'='1",
     {
       detectMaliciousPatterns: true,
@@ -99,13 +99,13 @@ async function main() {
   console.log(result.isValid); // false (detects SQL injection attempt)
 
   // Decode a complex URI
-  const decoded = await __processor__.asyncAutoDetectAndDecode(
+  const decoded = await __strl__.asyncAutoDetectAndDecode(
     "https://example.com?data=SGVsbG8gV29ybGQ="
   );
   console.log(decoded); // https://example.com?data=Hello World
 
   // Check if deep scanning is needed
-  const needsScan = __processor__.needsDeepScan(
+  const needsScan = __strl__.needsDeepScan(
     "https://example.com?user=<script>"
   );
   console.log(needsScan); // booelan
@@ -453,9 +453,9 @@ Both `checkUrl` and `asyncCheckUrl` validate URIs, but their execution models an
 ### Validating with checkUrl
 
 ````typescript
-import { __processor__ } from "strulink";
+import { __strl__ } from "strulink";
 
-const result = __processor__.checkUrl("https://google.com/api", {
+const result = __strl__.checkUrl("https://google.com/api", {
   literalValue: "nehonix.space",
   debug: true,
   fullCustomValidation: { domain: "test_domain", version: 1.2 },
@@ -483,7 +483,7 @@ Checks if a string is a valid URI with configurable rules and malicious pattern 
 - **Example**:
 
 ```typescript
-const isValid = __processor__.isValidUri(
+const isValid = __strl__.isValidUri(
   "https://xn--n3h.com?greeting=こんにちは",
   {
     allowInternationalChars: true,
@@ -506,7 +506,7 @@ Asynchronously validates a URI string, similar to `isValidUri` but designed for 
 - **Example**:
 
 ```typescript
-const isValid = await __processor__.asyncIsUrlValid("https://example.com", {
+const isValid = await __strl__.asyncIsUrlValid("https://example.com", {
   httpsOnly: true,
 });
 console.log(isValid); // true
@@ -521,7 +521,7 @@ Creates a native `URL` object from a URI string.
 - **Example**:
 
 ```typescript
-const url = __processor__.createUrl("https://example.com/path");
+const url = __strl__.createUrl("https://example.com/path");
 console.log(url.pathname); // /path
 ```
 
@@ -534,7 +534,7 @@ Detects encoding types in a URI string, with optional recursion for nested encod
 - **Example**:
 
 ```typescript
-const detection = __processor__.detectEncoding("hello%20world");
+const detection = __strl__.detectEncoding("hello%20world");
 console.log(detection.mostLikely); // percentEncoding
 ```
 
@@ -552,7 +552,7 @@ console.log(detection.mostLikely); // percentEncoding
 - **Example**:
 
 ```typescript
-const decoded = __processor__.autoDetectAndDecode(
+const decoded = __strl__.autoDetectAndDecode(
   "https://example.com?test=dHJ1ZQ=="
 );
 console.log(decoded); // https://example.com?test=true
@@ -567,7 +567,7 @@ Asynchronously decodes a URI to plaintext, suitable for complex URIs.
 - **Example**:
 
 ```typescript
-const decoded = await __processor__.asyncAutoDetectAndDecode(
+const decoded = await __strl__.asyncAutoDetectAndDecode(
   "https://example.com?data=SGVsbG8gV29ybGQ="
 );
 console.log(decoded); // https://example.com?data=Hello World
@@ -582,7 +582,7 @@ Generates a security report for a URI, including vulnerability analysis and reco
 - **Example**:
 
 ```typescript
-const report = __processor__.scanUrl(
+const report = __strl__.scanUrl(
   "https://example.com?user=admin' OR '1'='1"
 );
 console.log(report.recommendations); // ["Sanitize parameter \"user\" to prevent SQL injection..."]
@@ -602,7 +602,7 @@ Sanitizes input by removing potentially malicious patterns. **Note**: This metho
 - **Example**:
 
 ```typescript
-const sanitized = __processor__.sanitizeInput("<script>alert('xss')</script>");
+const sanitized = __strl__.sanitizeInput("<script>alert('xss')</script>");
 console.log(sanitized); // Sanitized string with malicious content removed
 ```
 
@@ -619,7 +619,7 @@ Lightweight check to determine if a string requires deep scanning. Use as a pre-
 - **Example**:
 
 ```typescript
-const needsScan = __processor__.needsDeepScan(
+const needsScan = __strl__.needsDeepScan(
   "https://example.com?user=<script>"
 );
 console.log(needsScan); // true
@@ -639,7 +639,7 @@ Analyzes input for malicious patterns and returns detailed detection results.
 - **Example**:
 
 ```typescript
-const result = __processor__.detectMaliciousPatterns(
+const result = __strl__.detectMaliciousPatterns(
   "https://example.com?user=admin' OR '1'='1",
   { sensitivity: 1.0 }
 );

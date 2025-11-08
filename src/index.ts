@@ -1,4 +1,4 @@
-import NES, { NehonixEncService as enc } from "./services/NehonixEnc.service";
+import NES, { NehonixEncService as enc } from "./services/StrlEnc.service";
 import { SecurityRules as sr } from "./rules/security.rules";
 import NDS, { NehonixDecService as dec } from "./services/NehonixDec.service";
 import { DEC_FEATURE_TYPE, ENC_TYPE } from "./types";
@@ -478,7 +478,7 @@ export type { MaliciousPatternResult } from "./services/MaliciousPatterns.servic
  * @returns The appropriately encoded string
  */
 export const __safeEncode__ = NehonixSafetyLayer.__safeEncode__;
-export { StruLink as __processor__ };
+export { StruLink as __strl__ };
 export const decodeB64 = (input: string) =>
   NDS.decode({
     input,

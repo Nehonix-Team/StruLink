@@ -10,8 +10,8 @@ import {
 import punycode from "punycode";
 import chalk from "chalk";
 import { ncu, NehonixCoreUtils } from "../utils/NehonixCoreUtils";
-import { NehonixSharedUtils } from "../common/NehonixCommonUtils";
-import NES from "./NehonixEnc.service";
+import { NehonixSharedUtils } from "../common/StrlCommonUtils";
+import NES from "./StrlEnc.service";
 import { sr } from "../rules/security.rules";
 import { htmlEntities } from "../utils/html.enties";
 import { AppLogger } from "../common/AppLogger";

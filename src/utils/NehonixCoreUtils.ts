@@ -1,5 +1,5 @@
 import { AppLogger } from "../common/AppLogger";
-import { NehonixSharedUtils } from "../common/NehonixCommonUtils";
+import { NehonixSharedUtils } from "../common/StrlCommonUtils";
 import { sr } from "../rules/security.rules";
 import { MaliciousPatternOptions } from "../services/MaliciousPatterns.service";
 import NSS from "../services/NehonixSecurity.service";
