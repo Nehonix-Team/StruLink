@@ -22,10 +22,15 @@ This directory contains the core detection and orchestration logic extracted fro
 - **Size**: ~200 lines (estimated)
 - **Methods**: `decode()`, `decodeAnyToPlaintext()`, `decodeSingle()`
 
-#### PartialDecoder.ts ⏳ TODO
+#### PartialDecoder.ts ✅ Implemented
 - **Purpose**: Partial and mixed encoding decoding
-- **Size**: ~150 lines (estimated)
-- **Methods**: `decodePartial()`, `decodeMixed()`, `tryPartialDecode()`
+- **Size**: ~260 lines
+- **Status**: Fully functional and tested
+- **Key Methods**:
+  - `decodePartial()` - Decode partially encoded strings
+  - `decodeMixed()` - Handle mixed encoding types
+  - `decodeMixedContent()` - Decode mixed percent/base64 content
+  - `tryPartialDecode()` - Attempt partial decode with validation
 
 ## Integration Strategy
 

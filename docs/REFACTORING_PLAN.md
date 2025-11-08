@@ -52,10 +52,10 @@ src/services/decoder/
 
 ### Phase 2: Extract Core Logic (Priority: High) ⏳ In Progress
 - ⏳ EncodingDetector.ts - Detection algorithms (~400 lines extracted, integration pending)
+- ✅ PartialDecoder.ts - Partial decoding (~260 lines, fully tested)
 - ⏳ DecoderCore.ts - Main decode method (TODO)
-- ⏳ PartialDecoder.ts - Partial decoding (TODO)
 
-**Note**: Core modules have circular dependency challenges. Will integrate after resolving dependencies.
+**Note**: Core modules have circular dependency challenges. PartialDecoder is complete and working. Will integrate after resolving dependencies.
 
 ### Phase 3: Extract URL Processing (Priority: Medium)
 - ⏳ UrlParameterDecoder.ts

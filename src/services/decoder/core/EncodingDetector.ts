@@ -6,7 +6,9 @@
  * Contains ~460 lines of detection logic
  */
 
+import { NehonixSharedUtils } from "../../../common/StrlCommonUtils";
 import { EncodingDetectionResult, ENC_TYPE } from "../../../types";
+import { ncu } from "../../../utils/NehonixCoreUtils";
 // Note: Avoiding circular dependencies by importing only what's needed
 // Full integration with NehonixSharedUtils and ncu will be done when
 // we refactor the main StrlDec.service to use this module
@@ -16,7 +18,7 @@ export class EncodingDetector {
   private static readonly default_checkurl_opt = {
     allowLocalhost: true,
     rejectDuplicatedValues: false,
-    maxUrlLength: "NO_LIMIT" as const,
+    maxUrlLength: "NO_LIMIT" as const, 
     strictMode: false,
     strictParamEncoding: false,
     debug: false,
