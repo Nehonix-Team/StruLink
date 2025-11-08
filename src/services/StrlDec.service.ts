@@ -636,6 +636,27 @@ class NDS {
         fn: utils.hasRawHexString,
         score: 0.85,
         minLength: 4,
+        partialDetectionFn: (s: string) => {
+          // Check if string is pure hex (only 0-9, a-f, A-F)
+          const isPureHex = /^[0-9A-Fa-f]+$/.test(s);
+          const isEvenLength = s.length % 2 === 0;
+          
+          // If it's pure hex with even length, boost confidence
+          if (isPureHex && isEvenLength && s.length >= 6) {
+            return { isPartial: false, ratio: 1.0 };
+          }
+          
+          const hexSegments = s.match(/[0-9A-Fa-f]{6,}/g);
+          const isPartial = hexSegments !== null && hexSegments.length > 0;
+          let totalHexLength = 0;
+          if (isPartial && hexSegments) {
+            totalHexLength = hexSegments.reduce(
+              (sum, seg) => sum + seg.length,
+              0
+            );
+          }
+          return { isPartial, ratio: totalHexLength / s.length };
+        },
       },
       {
         type: "unicode",
@@ -745,7 +766,11 @@ class NDS {
         // Then, try partial detection if available
         else if (partialDetectionFn) {
           const partialResult = partialDetectionFn(input);
-          if (partialResult.isPartial) {
+          
+          // If ratio is 1.0 and not marked as partial, treat as full encoding
+          if (partialResult.ratio >= 0.95 && !partialResult.isPartial) {
+            detectionScores[type] = score + 0.1; // Boost score for perfect match
+          } else if (partialResult.isPartial || partialResult.ratio > 0) {
             // Calculate confidence based on the ratio of encoded content
             const partialConfidence = 0.6 + partialResult.ratio * 0.3;
             detectionScores[
