@@ -132,5 +132,3 @@ MIT © [Nehonix Team](https://nehonix.space)
 - [Changelog](./docs/changelog.md)
 
 ---
-
-Made with ❤️ by [Nehonix Team](https://nehonix.space)
