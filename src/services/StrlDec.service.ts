@@ -23,7 +23,7 @@ import {
   UnicodeDecoder,
   HtmlDecoder,
   EscapeDecoder,
-  SpecialDecoder,
+  SpecialDecoder, 
 } from "./decoder/decoders";
 
 import { PartialDecoder } from "./decoder/core/PartialDecoder";

@@ -1,10 +1,16 @@
 {
   "name": "strulink",
   "version": "1.0.0",
-  "type": "module",
-  "module": "./dist/strulink.esm.js",
   "description": "A focused TypeScript library for URL/URI and String encoding, decoding, validation, and analysis utilities.",
+  "author": {
+    "name": "Nehonix",
+    "url": "https://nehonix.com",
+    "whatsapp": "https://s.nehonix.com/QBo0KpCl"
+  },
+  "license": "MIT",
+  "type": "module",
   "main": "./dist/strulink.cjs",
+  "module": "./dist/strulink.esm.js",
   "types": "./dist/strulink.d.ts",
   "exports": {
     ".": {
@@ -19,7 +25,13 @@
     "README.md",
     "LICENSE"
   ],
-  "homepage": "https://lab.nehonix.com",
+  "engines": {
+    "node": "\u003e=22.12.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Nehonix-Team/StruLink.git"
+  },
   "keywords": [
     "uri",
     "url",
@@ -40,38 +52,25 @@
   "scripts": {
     "build": "rollup -c",
     "dev": "rollup -c -w",
-    "prepublishOnly": "npm run build",
+    "major": "npm version major \u0026\u0026 npm publish",
+    "minor": "npm version minor \u0026\u0026 npm publish",
+    "patch": "npm version patch \u0026\u0026 npm publish",
     "prepare": "npm run build",
-    "test": "jest",
-    "patch": "npm version patch && npm publish",
-    "minor": "npm version minor && npm publish",
-    "major": "npm version major && npm publish"
+    "prepublishOnly": "npm run build",
+    "test": "jest"
   },
-  "sideEffects": false,
+  "dependencies": {
+    "idna-uts46-hx": "^6.0.8"
+  },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^28.0.3",
     "@rollup/plugin-node-resolve": "^16.0.1",
     "@rollup/plugin-typescript": "^12.1.2",
-    "@types/node": "^22.14.1",
+    "@types/node": "^25.6.0",
+    "i": "^0.3.7",
     "rollup": "^4.40.0",
     "rollup-plugin-dts": "^6.2.1",
     "ts-node": "^10.9.2",
     "tslib": "^2.8.1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/Nehonix-Team/StruLink.git"
-  },
-  "license": "MIT",
-  "engines": {
-    "node": ">=22.12.0"
-  },
-  "author": {
-    "name": "Nehonix",
-    "whatsapp": "https://s.nehonix.com/QBo0KpCl",
-    "url": "https://nehonix.com"
-  },
-  "dependencies": {
-    "idna-uts46-hx": "^6.0.8"
   }
 }

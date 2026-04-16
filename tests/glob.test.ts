@@ -1,4 +1,4 @@
-import { NSS as service } from "../services/NehonixSecurity.service";
+import { NSS as service } from "../src/services/StruSecurity.service";
 
 const tests = [
   {
@@ -267,7 +267,9 @@ const tests = [
 
 tests.forEach((test, index) => {
   console.log(`Test ${index + 1}: ${test.description}`);
-  const result = service.sanitizeInput("https://example.com/shop?category=books&sort=price&filter=new%20releases");
+  const result = service.sanitizeInput(
+    "https://example.com/shop?category=books&sort=price&filter=new%20releases",
+  );
   console.log("Result:", JSON.stringify(result, null, 2));
   console.log("---");
 });

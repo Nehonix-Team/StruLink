@@ -9,7 +9,7 @@ import {
   MaliciousPatternType,
   RelatedPatternGroup,
 } from "../services/MaliciousPatterns.service";
-import NSS from "../services/NehonixSecurity.service";
+import NSS from "../services/StruSecurity.service";
 
 export class NMPSUtils {
   private static SUSPICIOUS_PARAMETER_NAMES =
@@ -43,7 +43,7 @@ export class NMPSUtils {
    */
   static generateUrlRecommendation(
     detectedPatterns: DetectedPattern[],
-    componentResults: Record<MaliciousComponentType, MaliciousPatternResult>
+    componentResults: Record<MaliciousComponentType, MaliciousPatternResult>,
   ): string {
     if (detectedPatterns.length === 0) {
       return "No suspicious patterns detected in the URL.";
@@ -56,17 +56,17 @@ export class NMPSUtils {
     Object.entries(componentResults).forEach(([component, result]) => {
       if (result.detectedPatterns.length > 0) {
         const highSeverity = result.detectedPatterns.some(
-          (p) => p.severity === "high"
+          (p) => p.severity === "high",
         );
 
         if (highSeverity) {
           hasCriticalIssue = true;
           componentIssues.push(
-            `Critical issues found in the ${component} component`
+            `Critical issues found in the ${component} component`,
           );
         } else {
           componentIssues.push(
-            `Suspicious patterns found in the ${component} component`
+            `Suspicious patterns found in the ${component} component`,
           );
         }
       }
@@ -75,11 +75,11 @@ export class NMPSUtils {
     // Generate overall recommendation
     if (hasCriticalIssue) {
       return `This URL contains potentially malicious patterns. ${componentIssues.join(
-        ". "
+        ". ",
       )}. Consider blocking this URL and scanning related systems for compromise.`;
     } else if (componentIssues.length > 1) {
       return `This URL has multiple suspicious components: ${componentIssues.join(
-        "; "
+        "; ",
       )}. Recommend further review before processing this URL.`;
     } else {
       return `This URL contains suspicious patterns. ${componentIssues[0]}. Proceed with caution and validate the URL source.`;
@@ -90,13 +90,13 @@ export class NMPSUtils {
    * Finds related patterns across different components that might indicate a sophisticated attack
    */
   static findRelatedPatternGroups(
-    patterns: DetectedPattern[]
+    patterns: DetectedPattern[],
   ): RelatedPatternGroup[] {
     const groups: RelatedPatternGroup[] = [];
 
     // Find cross-site scripting patterns across multiple components
     const xssPatterns = patterns.filter(
-      (p) => p.type === MaliciousPatternType.XSS
+      (p) => p.type === MaliciousPatternType.XSS,
     );
     if (xssPatterns.length > 1) {
       groups.push({
@@ -109,7 +109,7 @@ export class NMPSUtils {
 
     // Find SQL injection patterns across multiple components
     const sqlInjectionPatterns = patterns.filter(
-      (p) => p.type === MaliciousPatternType.SQL_INJECTION
+      (p) => p.type === MaliciousPatternType.SQL_INJECTION,
     );
     if (sqlInjectionPatterns.length > 1) {
       groups.push({
@@ -124,7 +124,7 @@ export class NMPSUtils {
     const encodingPatterns = patterns.filter(
       (p) =>
         p.type === MaliciousPatternType.ENCODED_PAYLOAD ||
-        p.type === MaliciousPatternType.MULTI_ENCODING
+        p.type === MaliciousPatternType.MULTI_ENCODING,
     );
 
     // Check for encoding + injection combination (sophisticated attack)
@@ -135,7 +135,7 @@ export class NMPSUtils {
           p.type === MaliciousPatternType.XSS ||
           p.type === MaliciousPatternType.COMMAND_INJECTION ||
           p.type === MaliciousPatternType.TEMPLATE_INJECTION ||
-          p.type === MaliciousPatternType.NOSQL_INJECTION
+          p.type === MaliciousPatternType.NOSQL_INJECTION,
       );
 
       if (injectionPatterns.length > 0) {
@@ -153,7 +153,7 @@ export class NMPSUtils {
 
     // Detect potential combination attacks
     const hasRedirect = patterns.some(
-      (p) => p.type === MaliciousPatternType.OPEN_REDIRECT
+      (p) => p.type === MaliciousPatternType.OPEN_REDIRECT,
     );
     const hasXss = patterns.some((p) => p.type === MaliciousPatternType.XSS);
 
@@ -170,7 +170,7 @@ export class NMPSUtils {
 
     // Detect protocol confusion attacks
     const hasProtocolConfusion = patterns.some(
-      (p) => p.type === MaliciousPatternType.PROTOCOL_CONFUSION
+      (p) => p.type === MaliciousPatternType.PROTOCOL_CONFUSION,
     );
     const hasSsrf = patterns.some((p) => p.type === MaliciousPatternType.SSRF);
 
@@ -198,7 +198,7 @@ export class NMPSUtils {
     description: string,
     severity: "low" | "medium" | "high",
     results: DetectedPattern[],
-    options: Required<MaliciousPatternOptions>
+    options: Required<MaliciousPatternOptions>,
   ): void {
     for (const pattern of patterns) {
       const match = pattern.exec(input);
@@ -222,7 +222,7 @@ export class NMPSUtils {
 
         if (options.debug) {
           AppLogger.debug(
-            `NMPS: Detected ${type} pattern: '${matchedValue}' at index ${match.index}`
+            `NMPS: Detected ${type} pattern: '${matchedValue}' at index ${match.index}`,
           );
         }
 
@@ -238,7 +238,7 @@ export class NMPSUtils {
   static checkSuspiciousParameters(
     input: string,
     results: DetectedPattern[],
-    options: Required<MaliciousPatternOptions>
+    options: Required<MaliciousPatternOptions>,
   ): void {
     try {
       // Try to extract parameter names from URL query string
@@ -288,7 +288,7 @@ export class NMPSUtils {
   // In NehonixSecurity.service.txt
   static calculateConfidence(
     matchedValue: string,
-    fullInput: string
+    fullInput: string,
   ): "low" | "medium" | "high" {
     const matchRatio = matchedValue.length / fullInput.length;
 
@@ -361,7 +361,7 @@ export class NMPSUtils {
    */
   static calculateContextScore(
     match: RegExpExecArray,
-    fullInput: string
+    fullInput: string,
   ): number {
     let score = 1.0;
 
@@ -400,7 +400,7 @@ export class NMPSUtils {
   static performContextualAnalysis(
     patterns: DetectedPattern[],
     fullInput: string,
-    options: MaliciousPatternOptions
+    options: MaliciousPatternOptions,
   ): ContextAnalysisResult {
     // Find relationships between detected patterns
     const relatedGroups: RelatedPatternGroup[] =
@@ -620,7 +620,7 @@ export class NMPSUtils {
   // In NehonixSecurity.service.txt
   static calculateTotalScore(
     patterns: DetectedPattern[],
-    sensitivityMultiplier: number
+    sensitivityMultiplier: number,
   ): number {
     if (patterns.length === 0) return 0;
 
@@ -689,7 +689,7 @@ export class NMPSUtils {
    */
   static determineConfidence(
     score: number,
-    patternCount: number
+    patternCount: number,
   ): "low" | "medium" | "high" {
     if (score >= 75 || (score >= 50 && patternCount >= 3)) {
       return "high";
@@ -705,7 +705,7 @@ export class NMPSUtils {
    */
   static generateRecommendation(
     patterns: DetectedPattern[],
-    score: number
+    score: number,
   ): string {
     if (patterns.length === 0) {
       return "No malicious patterns detected. Input appears safe.";
@@ -717,52 +717,52 @@ export class NMPSUtils {
     // Critical recommendations first
     if (score >= 75) {
       recommendations.push(
-        "HIGH RISK: Input contains malicious patterns. Block and investigate immediately."
+        "HIGH RISK: Input contains malicious patterns. Block and investigate immediately.",
       );
     } else if (score >= 50) {
       recommendations.push(
-        "MEDIUM RISK: Input contains suspicious patterns. Validate before processing."
+        "MEDIUM RISK: Input contains suspicious patterns. Validate before processing.",
       );
     } else {
       recommendations.push(
-        "LOW RISK: Input contains potentially suspicious patterns. Use caution."
+        "LOW RISK: Input contains potentially suspicious patterns. Use caution.",
       );
     }
 
     // Specific recommendations based on pattern types
     if (patternTypes.has(MaliciousPatternType.SQL_INJECTION)) {
       recommendations.push(
-        "Implement prepared statements or parameterized queries for database operations."
+        "Implement prepared statements or parameterized queries for database operations.",
       );
     }
 
     if (patternTypes.has(MaliciousPatternType.XSS)) {
       recommendations.push(
-        "Implement output encoding and content security policy (CSP) headers."
+        "Implement output encoding and content security policy (CSP) headers.",
       );
     }
 
     if (patternTypes.has(MaliciousPatternType.COMMAND_INJECTION)) {
       recommendations.push(
-        "Avoid direct command execution. Use restricted APIs and allowlists."
+        "Avoid direct command execution. Use restricted APIs and allowlists.",
       );
     }
 
     if (patternTypes.has(MaliciousPatternType.PATH_TRAVERSAL)) {
       recommendations.push(
-        "Validate file paths and use path canonicalization before file operations."
+        "Validate file paths and use path canonicalization before file operations.",
       );
     }
 
     if (patternTypes.has(MaliciousPatternType.SSRF)) {
       recommendations.push(
-        "Implement allowlists for external resource access and validate URLs."
+        "Implement allowlists for external resource access and validate URLs.",
       );
     }
 
     if (patternTypes.has(MaliciousPatternType.RFI)) {
       recommendations.push(
-        "Validate file inclusions against a whitelist of allowed sources and disable remote file access."
+        "Validate file inclusions against a whitelist of allowed sources and disable remote file access.",
       );
     }
     if (
@@ -770,7 +770,7 @@ export class NMPSUtils {
       patternTypes.has(MaliciousPatternType.MULTI_ENCODING)
     ) {
       recommendations.push(
-        "Decode and normalize input before validation to prevent evasion techniques."
+        "Decode and normalize input before validation to prevent evasion techniques.",
       );
     }
 
@@ -882,7 +882,7 @@ export class NMPSUtils {
           ? ""
           : url.replace(
               new RegExp(protocol, "gi"),
-              `${protocol.replace(":", "_blocked:")}`
+              `${protocol.replace(":", "_blocked:")}`,
             );
       }
     }
@@ -918,7 +918,7 @@ export class NMPSUtils {
   public handlePotentialRedirect(
     url: string,
 
-    opts: any
+    opts: any,
   ): string {
     try {
       const parsedUrl = new URL(url);
@@ -945,7 +945,7 @@ export class NMPSUtils {
               NMPSUtils.sanitizeInput(redirectValue, {
                 ...opts,
                 strictMode: true, // More strict for embedded URLs
-              })
+              }),
             );
           }
         }

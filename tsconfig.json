@@ -17,6 +17,14 @@
     "allowSyntheticDefaultImports": true,
     "jsx": "react-jsx"
   },
-  "include": ["src/**/*", "src/__tests__/**/*", "*.ts"],
+  "include": [
+    "src/**/*",
+    "src/__tests__/**/*",
+    "*.ts",
+    "tests/glob.test.ts",
+    "tests/fetch.js",
+    "tests/dec.test.ts",
+    "tests/checkurl.test.ts"
+  ],
   "exclude": ["node_modules", "dist"]
 }

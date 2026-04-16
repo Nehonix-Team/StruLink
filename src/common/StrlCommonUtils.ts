@@ -63,7 +63,7 @@ class NehonixCommonUtils {
   // =============== BASIC DECODING METHODS ===============
 
   /**
-   * Decodes raw hexadecimal string (without prefixes)
+   * Decodes raw hexadecimal string (without prefixes) 
    */
   static drwp(hexString: string): string {
     // Verify the input is a valid string (even length only)

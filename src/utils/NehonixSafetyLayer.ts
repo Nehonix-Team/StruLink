@@ -1,5 +1,5 @@
 import NES from "../services/StrlEnc.service";
-import { ENC_TYPE, RWA_TYPES } from "../types";
+import { RWA_TYPES } from "../types";
 
 export class NehonixSafetyLayer {
   /**
@@ -18,7 +18,7 @@ export class NehonixSafetyLayer {
       doubleEncode?: boolean; // If true, applies encoding twice for higher security
       encodeSpaces?: boolean; // If true, encodes spaces as %20 instead of +
       preserveNewlines?: boolean; // If true, preserves newlines in the encoded output
-    } = {}
+    } = {},
   ): string {
     // Default options
     const {
@@ -94,7 +94,7 @@ export class NehonixSafetyLayer {
         // Escape special shell characters
         encodedString = input.replace(
           /([&;'"`\\|*?~<>^()[\]{}$\n\r\t#])/g,
-          "\\$1"
+          "\\$1",
         );
         break;
 

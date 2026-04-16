@@ -20,9 +20,6 @@ StruLink is a focused TypeScript library for URL/URI and string encoding, decodi
 [![npm version](https://img.shields.io/npm/v/strulink.svg)](https://www.npmjs.com/package/strulink)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-**Version**: 1.0.0  
-**License**: MIT  
-**Repository**: [github.com/Nehonix-Team/StruLink](https://github.com/Nehonix-Team/StruLink)
 
 ## Quick Start
 
@@ -118,30 +115,17 @@ __strl__.analyzeURL(url);
 __strl__.needsDeepScan(input);
 ```
 
-## Comparison: StruLink vs NehonixURIProcessor
-
-| Feature                 | StruLink     | NehonixURIProcessor      |
-| ----------------------- | ------------ | ------------------------ |
-| URL Encoding & Decoding | Supported    | Supported                |
-| Security Analysis       | Supported    | Supported                |
-| Framework Integrations  | Not Included | Included (Express/React) |
-| AI & ML Features        | Not Included | Included                 |
-| Dependencies            | 1            | 12+                      |
-| Bundle Size             | ~50KB        | ~2MB+                    |
-| Status                  | Active       | Deprecated Dec 2025      |
-
 ## Contribution Guidelines
 
 Contributions to the project are welcome. Please refer to our [Contributing Guide](./CONTRIBUTING.md) prior to submitting pull requests.
 
 ## License
 
-MIT Copyright (c) [Nehonix Team](https://nehonix.space)
+MIT Copyright (c) [Nehonix Team](https://github.com/Nehonix-Team)
 
 ## Key Links
 
 - [GitHub Repository](https://github.com/Nehonix-Team/StruLink)
 - [NPM Package](https://www.npmjs.com/package/strulink)
-- [Official Documentation](./docs/web/index.html)
 - [Issue Tracker](https://github.com/Nehonix-Team/StruLink/issues)
 - [Changelog](./docs/changelog.md)

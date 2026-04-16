@@ -4,7 +4,7 @@ import {
   MaliciousPatternOptions,
 } from "../services/MaliciousPatterns.service";
 import { NehonixEncService } from "../services/StrlEnc.service";
-import NSS from "../services/NehonixSecurity.service";
+import NSS from "../services/StruSecurity.service";
 import { URLAnalysisResult, WAFBypassVariants } from "../types";
 import { MaliciousComponentType as malicious_component_type } from "../types/v2.2.0";
 
@@ -17,7 +17,7 @@ export class SecurityRules {
 
   static analyzeMaliciousPatterns(
     url: string,
-    options?: MaliciousPatternOptions
+    options?: MaliciousPatternOptions,
   ) {
     const maliciousResult = NSS.analyzeUrl(url, options);
     return maliciousResult;

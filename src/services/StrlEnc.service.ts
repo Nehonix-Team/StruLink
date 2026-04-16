@@ -8,6 +8,8 @@ import {
   NestedEncodingOptions,
   NestedEncodingResponse,
 } from "../types/enc.type";
+
+
 class NES {
   /**
    * Encodes a string according to a specific encoding type
