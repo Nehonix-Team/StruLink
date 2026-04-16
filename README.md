@@ -81,15 +81,15 @@ console.log(analysis.isMalicious); // true
 
 ## Documentation
 
-**[Complete Documentation](./docs/web/index.html)** - Comprehensive API references and developer guides.
+**[Complete Documentation](./docs/readme.md)** - Main index for comprehensive API references and developer guides.
 
 ### Guide References
 
-- [API Reference](./docs/API.md) - Detailed method documentation
-- [Encoding Guide](./docs/ENCODING.md) - Supported encoding types and examples
-- [Security Features](./docs/SECURITY.md) - Analysis and pattern detection mechanisms
-- [Examples](./docs/EXAMPLES.md) - Common use cases and code samples
-- [Migration Guide](./docs/MIGRATION.md) - Migration steps from NehonixURIProcessor
+- [Core API Reference](./docs/api/StruLink.md) - Detailed method documentation for the `StruLink` class
+- [Safety Layer](./docs/security/SafetyLayer.md) - Context-aware encoding instructions
+- [Security Patterns](./docs/security/Patterns.md) - Threat intelligence and detection mechanisms
+- [General Utilities](./docs/utils/Utilities.md) - Independent utility functions
+- [Changelog](./docs/changelog.md) - Version history and updates
 
 ## Core API Reference
 
