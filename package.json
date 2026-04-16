@@ -1,6 +1,6 @@
 {
   "name": "strulink",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "description": "A focused TypeScript library for URL/URI and String encoding, decoding, validation, and analysis utilities.",
   "author": {
     "name": "Nehonix",
