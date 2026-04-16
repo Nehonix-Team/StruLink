@@ -1,21 +1,19 @@
 /**
  * Partial Decoding Module
  * Handles partial and mixed encoding decoding
- * 
+ *
  * Extracted from StrlDec.service.ts (~150 lines)
  */
 
 import { ENC_TYPE } from "../../../types";
 import { AppLogger } from "../../../common/AppLogger";
-import {
-  Base64Decoder
-} from "../decoders";
- 
+import { Base64Decoder } from "../decoders";
+
 export class PartialDecoder {
   /**
    * Decodes a string with partial encoding
    * Only decodes the encoded segments, preserving plain text
-   * 
+   *
    * @param input - String with partial encoding
    * @param baseEncodingType - The encoding type to decode
    * @returns Partially decoded string
@@ -108,25 +106,22 @@ export class PartialDecoder {
    * Decode only HTML entity segments
    */
   private static decodePartialHtmlEntity(input: string): string {
-    return input.replace(
-      /&[a-zA-Z]+;|&#[0-9]+;|&#x[0-9a-fA-F]+;/g,
-      (match) => {
-        try {
-          // Simple entity decoding without DOM
-          if (match.startsWith("&#x")) {
-            const hex = match.slice(3, -1);
-            return String.fromCharCode(parseInt(hex, 16));
-          } else if (match.startsWith("&#")) {
-            const dec = match.slice(2, -1);
-            return String.fromCharCode(parseInt(dec, 10));
-          }
-          // For named entities, return as-is (would need htmlEntities map)
-          return match;
-        } catch (e) {
-          return match;
+    return input.replace(/&[a-zA-Z]+;|&#[0-9]+;|&#x[0-9a-fA-F]+;/g, (match) => {
+      try {
+        // Simple entity decoding without DOM
+        if (match.startsWith("&#x")) {
+          const hex = match.slice(3, -1);
+          return String.fromCharCode(parseInt(hex, 16));
+        } else if (match.startsWith("&#")) {
+          const dec = match.slice(2, -1);
+          return String.fromCharCode(parseInt(dec, 10));
         }
+        // For named entities, return as-is (would need htmlEntities map)
+        return match;
+      } catch (e) {
+        return match;
       }
-    );
+    });
   }
 
   /**
@@ -163,7 +158,7 @@ export class PartialDecoder {
         } catch (e) {
           return match;
         }
-      }
+      },
     );
   }
 
@@ -245,6 +240,11 @@ export class PartialDecoder {
       result = this.decodePartial(result, "jsEscape");
     }
 
+    // Fourth pass: decode raw hex
+    if (/[0-9A-Fa-f]{16,}/.test(result)) {
+      result = this.decodePartial(result, "rawHexadecimal");
+    }
+
     return result;
   }
 
@@ -254,7 +254,7 @@ export class PartialDecoder {
    */
   static tryPartialDecode(
     input: string,
-    encodingType: ENC_TYPE
+    encodingType: ENC_TYPE,
   ): {
     success: boolean;
     decoded?: string;

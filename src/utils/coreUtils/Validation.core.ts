@@ -34,18 +34,20 @@ export class ValidationCore extends NehonixSharedUtils {
     literalValue: "@this",
   };
 
-
   static checkUrl(
     url: string,
-    options: UrlValidationOptions = this.defautltValidationOpt,
+    options: UrlValidationOptions = ValidationCore.defautltValidationOpt,
   ): UrlCheckResult {
     // Apply validation level if specified (overrides other options)
-    if (options.validationLevel) {
-      options = this.getValidationOptionsByLevel(
+    if (options && options.validationLevel) {
+      options = ValidationCore.getValidationOptionsByLevel(
         options.validationLevel,
         options,
       );
     }
+
+    // Fallback if options was undefined despite defaults
+    if (!options) options = ValidationCore.defautltValidationOpt;
 
     const result: UrlCheckResult = {
       isValid: true,

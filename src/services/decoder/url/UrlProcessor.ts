@@ -1,7 +1,7 @@
 /**
  * URL Processing Module
  * Handles URL-specific decoding operations
- * 
+ *
  * Extracted from StrlDec.service.ts
  */
 
@@ -13,7 +13,7 @@ export class UrlProcessor {
   /**
    * Detects and handles raw hex-encoded URLs
    * Checks if input is a hex-encoded URL and decodes it
-   * 
+   *
    * @param input - Potential hex-encoded URL
    * @returns Decoded URL or original input
    */
@@ -22,7 +22,7 @@ export class UrlProcessor {
     if (/^[0-9A-Fa-f]+$/.test(input) && input.length % 2 === 0) {
       try {
         const decoded = HexDecoder.decodeRawHex(input);
-        
+
         // Check if decoded result looks like a URL
         if (decoded.includes("://") || decoded.startsWith("http")) {
           return decoded;
@@ -31,7 +31,7 @@ export class UrlProcessor {
         // Not a valid hex URL, return original
       }
     }
-    
+
     return input;
   }
 
@@ -51,9 +51,11 @@ export class UrlProcessor {
   /**
    * Extracts base URL and query string
    */
-  static splitUrl(url: string): { baseUrl: string; queryString: string } | null {
+  static splitUrl(
+    url: string,
+  ): { baseUrl: string; queryString: string } | null {
     if (!url.includes("?")) return null;
-    
+
     const [baseUrl, queryString] = url.split("?", 2);
     return queryString ? { baseUrl, queryString } : null;
   }
@@ -61,10 +63,12 @@ export class UrlProcessor {
   /**
    * Parses query parameters preserving && separators
    */
-  static parseQueryParams(queryString: string): Array<{ key: string; value: string; original: string }> {
+  static parseQueryParams(
+    queryString: string,
+  ): Array<{ key: string; value: string; original: string }> {
     const params = queryString.split(/&{1,2}/);
-    
-    return params.map(param => {
+
+    return params.map((param) => {
       if (param.includes("=")) {
         const [key, value] = param.split("=", 2);
         return { key, value, original: param };
@@ -85,8 +89,9 @@ export class UrlProcessor {
    */
   static isPrintable(value: string, threshold: number = 0.8): boolean {
     if (!value || value.length === 0) return false;
-    
-    const printableRatio = value.replace(/[^\x20-\x7E]/g, "").length / value.length;
+
+    const printableRatio =
+      value.replace(/[^\x20-\x7E]/g, "").length / value.length;
     return printableRatio > threshold;
   }
 
@@ -98,8 +103,8 @@ export class UrlProcessor {
 
     const encodingPatterns: Array<{ type: ENC_TYPE; pattern: RegExp }> = [
       { type: "percentEncoding", pattern: /%[0-9A-Fa-f]{2}/ },
-      { type: "base64", pattern: /^[A-Za-z0-9+/=]{4,}$/ },
       { type: "rawHexadecimal", pattern: /^[0-9A-Fa-f]{6,}$/ },
+      { type: "base64", pattern: /^[A-Za-z0-9+/=]{4,}$/ },
       { type: "unicode", pattern: /\\u[0-9A-Fa-f]{4}/ },
       { type: "jsEscape", pattern: /\\x[0-9A-Fa-f]{2}/ },
     ];

@@ -1,7 +1,7 @@
 /**
  * Encoding Detection Module (Working Version)
  * Handles automatic detection of encoding types with confidence scoring
- * 
+ *
  * Self-contained to avoid circular dependencies
  */
 
@@ -57,7 +57,7 @@ export class EncodingDetector {
   static detectEncoding(
     input: string,
     depth: number = 0,
-    utils: any
+    utils: any,
   ): EncodingDetectionResult {
     if (depth > this.MAX_DEPTH || !input || input.length < 2) {
       return {
@@ -96,35 +96,35 @@ export class EncodingDetector {
           if (/%[0-9A-Fa-f]{2}/.test(value)) {
             detectionScores["percentEncoding"] = Math.max(
               detectionScores["percentEncoding"] || 0,
-              0.85
+              0.85,
             );
             hasEncodedParams = true;
           }
           if (/^[A-Za-z0-9+\/=]{4,}$/.test(value)) {
             detectionScores["base64"] = Math.max(
               detectionScores["base64"] || 0,
-              0.82
+              0.82,
             );
             hasEncodedParams = true;
           }
           if (/^[0-9A-Fa-f]+$/.test(value) && value.length % 2 === 0) {
             detectionScores["rawHexadecimal"] = Math.max(
               detectionScores["rawHexadecimal"] || 0,
-              0.8
+              0.8,
             );
             hasEncodedParams = true;
           }
           if (/\\u[0-9A-Fa-f]{4}/.test(value)) {
             detectionScores["unicode"] = Math.max(
               detectionScores["unicode"] || 0,
-              0.85
+              0.85,
             );
             hasEncodedParams = true;
           }
           if (/\\x[0-9A-Fa-f]{2}/.test(value)) {
             detectionScores["jsEscape"] = Math.max(
               detectionScores["jsEscape"] || 0,
-              0.83
+              0.83,
             );
             hasEncodedParams = true;
           }
@@ -172,7 +172,7 @@ export class EncodingDetector {
           if (isPartial && base64Segments) {
             totalBase64Length = base64Segments.reduce(
               (sum, seg) => sum + seg.length,
-              0
+              0,
             );
           }
           return { isPartial, ratio: totalBase64Length / s.length };
@@ -212,7 +212,7 @@ export class EncodingDetector {
           if (isPartial && hexSegments) {
             totalHexLength = hexSegments.reduce(
               (sum, seg) => sum + seg.length,
-              0
+              0,
             );
           }
           return { isPartial, ratio: totalHexLength / s.length };
@@ -221,7 +221,7 @@ export class EncodingDetector {
       {
         type: "rawHexadecimal",
         fn: utils.hasRawHexString,
-        score: 0.85,
+        score: 0.92,
         minLength: 4,
         partialDetectionFn: (s: string) => {
           const isPureHex = /^[0-9A-Fa-f]+$/.test(s);
@@ -235,7 +235,7 @@ export class EncodingDetector {
           if (isPartial && hexSegments) {
             totalHexLength = hexSegments.reduce(
               (sum, seg) => sum + seg.length,
-              0
+              0,
             );
           }
           return { isPartial, ratio: totalHexLength / s.length };
@@ -247,12 +247,13 @@ export class EncodingDetector {
         score: 0.8,
         partialDetectionFn: (s: string) => {
           const unicodeMatches = s.match(/\\u[0-9A-Fa-f]{4}/g);
-          const isPartial = unicodeMatches !== null && unicodeMatches.length > 0;
+          const isPartial =
+            unicodeMatches !== null && unicodeMatches.length > 0;
           let totalUnicodeLength = 0;
           if (isPartial && unicodeMatches) {
             totalUnicodeLength = unicodeMatches.reduce(
               (sum, seg) => sum + seg.length,
-              0
+              0,
             );
           }
           return { isPartial, ratio: totalUnicodeLength / s.length };
@@ -264,14 +265,14 @@ export class EncodingDetector {
         score: 0.8,
         partialDetectionFn: (s: string) => {
           const entityMatches = s.match(
-            /&[a-zA-Z]+;|&#[0-9]+;|&#x[0-9a-fA-F]+;/g
+            /&[a-zA-Z]+;|&#[0-9]+;|&#x[0-9a-fA-F]+;/g,
           );
           const isPartial = entityMatches !== null && entityMatches.length > 0;
           let totalEntityLength = 0;
           if (isPartial && entityMatches) {
             totalEntityLength = entityMatches.reduce(
               (sum, seg) => sum + seg.length,
-              0
+              0,
             );
           }
           return { isPartial, ratio: totalEntityLength / s.length };
@@ -283,7 +284,7 @@ export class EncodingDetector {
       {
         type: "rot13",
         fn: utils.isRot13.bind(utils),
-        score: 0.75,
+        score: 0.92,
         partialDetectionFn: (s: string) => {
           const hasOnlyLetters = /^[a-zA-Z]+$/.test(s);
           if (hasOnlyLetters && s.length >= 4) {
@@ -310,7 +311,7 @@ export class EncodingDetector {
         score: 0.8,
         partialDetectionFn: (s: string) => {
           const jsEscapeMatches = s.match(
-            /\\x[0-9A-Fa-f]{2}|\\u[0-9A-Fa-f]{4}|\\[0-7]{3}/g
+            /\\x[0-9A-Fa-f]{2}|\\u[0-9A-Fa-f]{4}|\\[0-7]{3}/g,
           );
           const isPartial =
             jsEscapeMatches !== null && jsEscapeMatches.length > 0;
@@ -318,7 +319,7 @@ export class EncodingDetector {
           if (isPartial && jsEscapeMatches) {
             totalEscapeLength = jsEscapeMatches.reduce(
               (sum, seg) => sum + seg.length,
-              0
+              0,
             );
           }
           return { isPartial, ratio: totalEscapeLength / s.length };
@@ -328,7 +329,13 @@ export class EncodingDetector {
       { type: "jwt", fn: utils.hasJWTFormat, score: 0.95, minLength: 15 },
     ];
 
-    for (const { type, fn, score, minLength, partialDetectionFn } of detectionChecks) {
+    for (const {
+      type,
+      fn,
+      score,
+      minLength,
+      partialDetectionFn,
+    } of detectionChecks) {
       if (minLength && input.length < minLength) continue;
 
       try {
@@ -361,7 +368,10 @@ export class EncodingDetector {
       };
     }
 
-    let mostLikely: ENC_TYPE | "plainText" | "mixedEncoding" = types[0] as ENC_TYPE | "plainText" | "mixedEncoding";
+    let mostLikely: ENC_TYPE | "plainText" | "mixedEncoding" = types[0] as
+      | ENC_TYPE
+      | "plainText"
+      | "mixedEncoding";
     let highestScore = detectionScores[types[0]];
 
     for (const type of types) {

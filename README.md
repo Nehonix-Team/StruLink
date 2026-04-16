@@ -7,7 +7,6 @@
 > StruLink is the official successor. It is a simplified, refocused version featuring:
 >
 > - Pure URL/URI and String encoding, decoding, and validation utilities.
-> - Zero framework dependencies (no Express or React logic).
 > - A minimal footprint (only 1 runtime dependency).
 > - Note: AI/ML features, Python microservices, and framework integrations have been removed.
 >

@@ -63,13 +63,13 @@ class NehonixCommonUtils {
   // =============== BASIC DECODING METHODS ===============
 
   /**
-   * Decodes raw hexadecimal string (without prefixes) 
+   * Decodes raw hexadecimal string (without prefixes)
    */
   static drwp(hexString: string): string {
     // Verify the input is a valid string (even length only)
     if (!/^[0-9A-Fa-f]+$/.test(hexString) || hexString.length % 2 !== 0) {
       throw new Error(
-        "Invalid hex string: length must be even or contains non-hex characters"
+        "Invalid hex string: length must be even or contains non-hex characters",
       );
     }
 
@@ -198,20 +198,25 @@ class NehonixCommonUtils {
     // Calculate frequency sums for each set
     const commonLetterSum = Object.values(letterFrequency).reduce(
       (a, b) => a + b,
-      0
+      0,
     );
     const rot13LetterSum = Object.values(rot13Frequency).reduce(
       (a, b) => a + b,
-      0
+      0,
     );
     const decoded = NDS.decodeRot13(s);
-    const decoded_test = /^[a-zA-Z0-9:/?=&.]+$/.test(decoded) && decoded !== s;
+    const decoded_test = /^[a-zA-Z0-9:/?=&.-]+$/.test(decoded) && decoded !== s;
+
+    // Explicitly check for ROT13 encoded HTTP/HTTPS URLs pattern
+    const isRot13Url = /^uggcf?:\/\//i.test(s) && decoded_test;
+
     // If ROT13 pattern letters appear more frequently, it's likely ROT13
     return (
-      hasCommonRot13Patterns &&
-      hasAlphaAndSpaces &&
-      rot13LetterSum > commonLetterSum * 1.2 &&
-      decoded_test
+      (hasCommonRot13Patterns &&
+        hasAlphaAndSpaces &&
+        rot13LetterSum > commonLetterSum * 1.2 &&
+        decoded_test) ||
+      isRot13Url
     );
   }
 
@@ -236,7 +241,7 @@ class NehonixCommonUtils {
     try {
       const decoded = Buffer.from(
         input.replace(/-/g, "+").replace(/_/g, "/"),
-        "base64"
+        "base64",
       ).toString();
       // Check if the decoded result makes sense
       const printableChars = decoded.replace(/[^\x20-\x7E\t\r\n]/g, "").length;
@@ -495,7 +500,7 @@ class NehonixCommonUtils {
       if (s.includes(delimiter)) {
         const parts = s.split(delimiter);
         const allHexPairs = parts.every((part) =>
-          /^[0-9A-Fa-f]{2}$/.test(part)
+          /^[0-9A-Fa-f]{2}$/.test(part),
         );
         return allHexPairs && parts.length > 2;
       }
@@ -679,7 +684,7 @@ class NehonixCommonUtils {
     // Check that each part is non-empty and base64url-encoded
     const base64urlPattern = /^[A-Za-z0-9_-]+$/;
     const allPartsValid = parts.every(
-      (part) => part.length > 0 && base64urlPattern.test(part)
+      (part) => part.length > 0 && base64urlPattern.test(part),
     );
 
     if (!allPartsValid) return false;
@@ -688,7 +693,7 @@ class NehonixCommonUtils {
     try {
       // This is a simplified check - in real code you would use a proper base64url decoder
       const header = JSON.parse(
-        atob(parts[0].replace(/-/g, "+").replace(/_/g, "/"))
+        atob(parts[0].replace(/-/g, "+").replace(/_/g, "/")),
       );
       // Check for typical JWT header fields
       return header && (header.alg || header.typ);
