@@ -8,7 +8,7 @@ const checkUrl = StruLink.checkUrl;
 function test(
   name: string,
   callback: () => { actual: any; expected: any },
-  debug: boolean = false
+  debug: boolean = false,
 ): { name: string; passed: boolean; details?: string } {
   try {
     const { actual, expected } = callback();
@@ -56,7 +56,7 @@ function test(
                 passed = false;
                 details += `Result[${i}].message: Expected to include "${expResult.message}", but got "${actResult?.message}"\n`;
               }
-            }
+            },
           );
         }
       }
@@ -127,7 +127,7 @@ const tests: {
       const options = {
         customValidations: [
           ["literal", "===", "google.com"],
-          ["literal", "!=", "nehonix.space"],
+          ["literal", "!=", "nehonix.com"],
         ],
         literalValue: "google.com",
       };
@@ -145,7 +145,7 @@ const tests: {
                 },
                 {
                   isValid: true,
-                  message: "Validation passed: literal != nehonix.space",
+                  message: "Validation passed: literal != nehonix.com",
                 },
               ],
             },
@@ -225,7 +225,7 @@ const tests: {
     callback: () => {
       const url = "https://google.com";
       const options: any = {
-        customValidations: [["toJSON" as any, "==", "nehonix.space"]],
+        customValidations: [["toJSON" as any, "==", "nehonix.com"]],
         debug: true,
       };
       return {

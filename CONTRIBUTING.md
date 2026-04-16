@@ -159,7 +159,6 @@ All code contributions should include appropriate tests:
 - Test edge cases and error conditions
 - Use the project's testing framework and conventions
 
-
 ## Documentation
 
 Good documentation is essential for the project's usability and maintainability:
@@ -201,6 +200,6 @@ We welcome feature requests that align with the project's goals:
 Join our community to discuss the project, get help, and collaborate:
 
 - GitHub Discussions: Ask questions and share ideas
-- Security Reports: For sensitive security issues, please email security@nehonix.space instead of creating public issues
+- Security Reports: For sensitive security issues, please email security@nehonix.com instead of creating public issues
 - Contributing: We welcome contributors of all experience levels
 - Code of Conduct: All community interactions are governed by our Code of Conduct

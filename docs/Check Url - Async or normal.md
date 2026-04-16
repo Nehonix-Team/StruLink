@@ -88,7 +88,7 @@ A `ComparisonRule` defines a validation rule for a URL component or custom prope
 type ComparisonRule = [
   ValidUrlComponents | custumValidUriComponent,
   comparisonOperator,
-  string | number
+  string | number,
 ];
 ```
 
@@ -131,7 +131,7 @@ type ComparisonRule = [
 Rules can reference:
 
 - Standard URL components (e.g., `["hostname", "===", "example.com"]`).
-- Literal values (e.g., `["literal", "===", "nehonix.space"]` with `literalValue` set).
+- Literal values (e.g., `["literal", "===", "nehonix.com"]` with `literalValue` set).
 - Custom properties (e.g., `["fullCustomValidation.domain", "===", "test_domain"]` or `["fcv.domain", "===", "test_domain"]`).
 
 ### Return Value
@@ -287,7 +287,7 @@ The `fullCustomValidation` option (aliased as `fcv`) allows defining custom prop
 
 ## literalValue Usage
 
-The `literalValue` option specifies the value for `literal` rules in `customValidations`. It defaults to `"@this"`, which uses the input `url`. For specific comparisons (e.g., `["literal", "===", "nehonix.space"]`), set `literalValue` explicitly.
+The `literalValue` option specifies the value for `literal` rules in `customValidations`. It defaults to `"@this"`, which uses the input `url`. For specific comparisons (e.g., `["literal", "===", "nehonix.com"]`), set `literalValue` explicitly.
 
 ## Question: Synchronous (checkUrl) vs. Asynchronous (asyncCheckUrl) - Which is Best and When?
 
@@ -300,7 +300,6 @@ When should you use `checkUrl` versus `asyncCheckUrl`? How do their performance 
 Both `checkUrl` and `asyncCheckUrl` validate URIs, but their execution models and capabilities differ, impacting their suitability for various scenarios:
 
 - **checkUrl (Synchronous)**:
-
   - **Pros**:
     - Faster for simple validations, completing in microseconds, as it avoids Promise overhead.
     - Ideal for lightweight, single-threaded applications or quick checks in non-async contexts (e.g., CLI tools, synchronous middleware).
@@ -315,7 +314,6 @@ Both `checkUrl` and `asyncCheckUrl` validate URIs, but their execution models an
   - **Performance**: Microseconds for simple URLs, but may scale poorly with complex rules.
 
 - **asyncCheckUrl (Asynchronous)**:
-
   - **Pros**:
     - Includes malicious pattern detection, critical for security-focused applications (e.g., detecting XSS, SQL injection).
     - Non-blocking, ideal for event-driven environments like web servers or React apps.
@@ -330,7 +328,6 @@ Both `checkUrl` and `asyncCheckUrl` validate URIs, but their execution models an
   - **Performance**: Milliseconds, but non-blocking, suitable for high-concurrency scenarios.
 
 - **When to Choose**:
-
   - Use `checkUrl` for fast, non-security-critical validations in synchronous environments.
   - Use `asyncCheckUrl` for security-critical applications or async environments where non-blocking is essential.
   - **Precious Time to Use**:
@@ -348,13 +345,13 @@ Both `checkUrl` and `asyncCheckUrl` validate URIs, but their execution models an
 import { __processor__ } from "strulink";
 
 const result = __processor__.checkUrl("https://google.com/api", {
-  literalValue: "nehonix.space",
+  literalValue: "nehonix.com",
   debug: true,
   fullCustomValidation: { domain: "test_domain", version: 1.2 },
   customValidations: [
     ["hostname", "===", "google.com"],
     ["pathname", "===", "/api"],
-    ["literal", "===", "nehonix.space"],
+    ["literal", "===", "nehonix.com"],
     ["fcv.domain", "===", "test_domain"],
     ["fcv.version", ">=", 1.0],
   ],
@@ -369,18 +366,18 @@ console.log(result);
     parsing: { isValid: true, message: "URL parsed successfully" },
     customValidations: {
       isValid: false,
-      message: "Validation passed: hostname === google.com; Validation passed: pathname === /api; Validation failed: literal === nehonix.space; Validation passed: fcv.domain === test_domain; Validation passed: fcv.version >= 1.0",
+      message: "Validation passed: hostname === google.com; Validation passed: pathname === /api; Validation failed: literal === nehonix.com; Validation passed: fcv.domain === test_domain; Validation passed: fcv.version >= 1.0",
       results: [
         { isValid: true, message: "Validation passed: hostname === google.com", rule: ["hostname", "===", "google.com"] },
         { isValid: true, message: "Validation passed: pathname === /api", rule: ["pathname", "===", "/api"] },
-        { isValid: false, message: "Validation failed: literal === nehonix.space", rule: ["literal", "===", "nehonix.space"] },
+        { isValid: false, message: "Validation failed: literal === nehonix.com", rule: ["literal", "===", "nehonix.com"] },
         { isValid: true, message: "Validation passed: fcv.domain === test_domain", rule: ["fcv.domain", "===", "test_domain"] },
         { isValid: true, message: "Validation passed: fcv.version >= 1.0", rule: ["fcv.version", ">=", 1.0] }
       ]
     },
     // ...other validation details
   },
-  cause: "Validation failed: literal === nehonix.space"
+  cause: "Validation failed: literal === nehonix.com"
 }
 */
 ```
@@ -398,7 +395,7 @@ const result = await __processor__.asyncCheckUrl(
       ["pathname", "===", "/"],
       ["literal", "===", "@this"],
     ],
-  }
+  },
 );
 
 console.log(result);

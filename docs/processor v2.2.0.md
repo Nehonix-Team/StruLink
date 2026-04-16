@@ -4,7 +4,7 @@ A comprehensive TypeScript library for detecting, decoding, and encoding various
 
 **Version**: 2.2.0  
 **License**: MIT  
-**Documentation**: [lab.nehonix.space](https://lab.nehonix.space/nehonix_viewer/_doc/StruLink/readme)
+**Documentation**: [lab.nehonix.com](https://lab.nehonix.com/nehonix_viewer/_doc/StruLink/readme)
 
 ## Table of Contents
 
@@ -80,19 +80,19 @@ async function main() {
       customMaliciousPatterns: [MaliciousPatternType.ANOMALY],
       maliciousPatternSensitivity: 1.0,
       maliciousPatternMinScore: 50,
-    }
+    },
   );
   console.log(result.isValid); // false (detects SQL injection attempt)
 
   // Decode a complex URI
   const decoded = await __processor__.asyncAutoDetectAndDecode(
-    "https://example.com?data=SGVsbG8gV29ybGQ="
+    "https://example.com?data=SGVsbG8gV29ybGQ=",
   );
   console.log(decoded); // https://example.com?data=Hello World
 
   // Check if deep scanning is needed
   const needsScan = __processor__.needsDeepScan(
-    "https://example.com?user=<script>"
+    "https://example.com?user=<script>",
   );
   console.log(needsScan); // booelan
 }
@@ -182,7 +182,7 @@ A `ComparisonRule` defines a validation rule for a URL component or custom prope
 type ComparisonRule = [
   ValidUrlComponents | custumValidUriComponent,
   comparisonOperator,
-  string | number
+  string | number,
 ];
 ```
 
@@ -225,7 +225,7 @@ type ComparisonRule = [
 Rules can reference:
 
 - Standard URL components (e.g., `["hostname", "===", "example.com"]`).
-- Literal values (e.g., `["literal", "===", "nehonix.space"]` with `literalValue` set).
+- Literal values (e.g., `["literal", "===", "nehonix.com"]` with `literalValue` set).
 - Custom properties (e.g., `["fullCustomValidation.domain", "===", "test_domain"]` or `["fcv.domain", "===", "test_domain"]`).
 
 ### Return Value
@@ -381,7 +381,7 @@ The `fullCustomValidation` option (aliased as `fcv`) allows defining custom prop
 
 ## literalValue Usage
 
-The `literalValue` option specifies the value for `literal` rules in `customValidations`. It defaults to `"@this"`, which uses the input `url`. For specific comparisons (e.g., `["literal", "===", "nehonix.space"]`), set `literalValue` explicitly.
+The `literalValue` option specifies the value for `literal` rules in `customValidations`. It defaults to `"@this"`, which uses the input `url`. For specific comparisons (e.g., `["literal", "===", "nehonix.com"]`), set `literalValue` explicitly.
 
 ## Question: Synchronous (checkUrl) vs. Asynchronous (asyncCheckUrl) - Which is Best and When?
 
@@ -394,7 +394,6 @@ When should you use `checkUrl` versus `asyncCheckUrl`? How do their performance 
 Both `checkUrl` and `asyncCheckUrl` validate URIs, but their execution models and capabilities differ, impacting their suitability for various scenarios:
 
 - **checkUrl (Synchronous)**:
-
   - **Pros**:
     - Faster for simple validations, completing in microseconds, as it avoids Promise overhead.
     - Ideal for lightweight, single-threaded applications or quick checks in non-async contexts (e.g., CLI tools, synchronous middleware).
@@ -409,7 +408,6 @@ Both `checkUrl` and `asyncCheckUrl` validate URIs, but their execution models an
   - **Performance**: Microseconds for simple URLs, but may scale poorly with complex rules.
 
 - **asyncCheckUrl (Asynchronous)**:
-
   - **Pros**:
     - Includes malicious pattern detection, critical for security-focused applications (e.g., detecting XSS, SQL injection).
     - Non-blocking, ideal for event-driven environments like web servers or React apps.
@@ -424,7 +422,6 @@ Both `checkUrl` and `asyncCheckUrl` validate URIs, but their execution models an
   - **Performance**: Milliseconds, but non-blocking, suitable for high-concurrency scenarios.
 
 - **When to Choose**:
-
   - Use `checkUrl` for fast, non-security-critical validations in synchronous environments.
   - Use `asyncCheckUrl` for security-critical applications or async environments where non-blocking is essential.
   - **Precious Time to Use**:
@@ -442,13 +439,13 @@ Both `checkUrl` and `asyncCheckUrl` validate URIs, but their execution models an
 import { __processor__ } from "strulink";
 
 const result = __processor__.checkUrl("https://google.com/api", {
-  literalValue: "nehonix.space",
+  literalValue: "nehonix.com",
   debug: true,
   fullCustomValidation: { domain: "test_domain", version: 1.2 },
   customValidations: [
     ["hostname", "===", "google.com"],
     ["pathname", "===", "/api"],
-    ["literal", "===", "nehonix.space"],
+    ["literal", "===", "nehonix.com"],
     ["fcv.domain", "===", "test_domain"],
     ["fcv.version", ">=", 1.0],
   ],
@@ -483,7 +480,6 @@ console.log(isValid); // true
 Asynchronously validates a URI string, similar to `isValidUri` but designed for async workflows.
 
 - **Parameters**:
-
   - `url` (`string`): The URI to validate.
   - `options` (optional): Same as `isValidUri`.
 
@@ -529,7 +525,6 @@ console.log(detection.mostLikely); // percentEncoding
 **Recommended**: Automatically detects and decodes a URI to plaintext.
 
 - **Parameters**:
-
   - `input` (`string`): The URI to decode.
   - `maxIterations` (`number`, default: `10`): Limits decoding iterations.
 
@@ -539,7 +534,7 @@ console.log(detection.mostLikely); // percentEncoding
 
 ```typescript
 const decoded = __processor__.autoDetectAndDecode(
-  "https://example.com?test=dHJ1ZQ=="
+  "https://example.com?test=dHJ1ZQ==",
 );
 console.log(decoded); // https://example.com?test=true
 ```
@@ -554,7 +549,7 @@ Asynchronously decodes a URI to plaintext, suitable for complex URIs.
 
 ```typescript
 const decoded = await __processor__.asyncAutoDetectAndDecode(
-  "https://example.com?data=SGVsbG8gV29ybGQ="
+  "https://example.com?data=SGVsbG8gV29ybGQ=",
 );
 console.log(decoded); // https://example.com?data=Hello World
 ```
@@ -569,7 +564,7 @@ Generates a security report for a URI, including vulnerability analysis and reco
 
 ```typescript
 const report = __processor__.scanUrl(
-  "https://example.com?user=admin' OR '1'='1"
+  "https://example.com?user=admin' OR '1'='1",
 );
 console.log(report.recommendations); // ["Sanitize parameter \"user\" to prevent SQL injection..."]
 ```
@@ -579,7 +574,6 @@ console.log(report.recommendations); // ["Sanitize parameter \"user\" to prevent
 Sanitizes input by removing potentially malicious patterns. **Note**: This method is not stable and should be used cautiously.
 
 - **Parameters**:
-
   - `input` (`string`): The string to sanitize.
   - `options` (optional): Additional sanitization options.
 
@@ -597,7 +591,6 @@ console.log(sanitized); // Sanitized string with malicious content removed
 Lightweight check to determine if a string requires deep scanning. Use as a pre-filter before full pattern detection.
 
 - **Parameters**:
-
   - `input` (`string`): The string to check.
 
 - **Returns**: `boolean` (whether deep scanning is needed).
@@ -606,7 +599,7 @@ Lightweight check to determine if a string requires deep scanning. Use as a pre-
 
 ```typescript
 const needsScan = __processor__.needsDeepScan(
-  "https://example.com?user=<script>"
+  "https://example.com?user=<script>",
 );
 console.log(needsScan); // true
 ```
@@ -616,7 +609,6 @@ console.log(needsScan); // true
 Analyzes input for malicious patterns and returns detailed detection results.
 
 - **Parameters**:
-
   - `input` (`string`): The string to analyze.
   - `options` (`MaliciousPatternOptions`, optional): Configuration for detection (e.g., sensitivity, patterns).
 
@@ -627,7 +619,7 @@ Analyzes input for malicious patterns and returns detailed detection results.
 ```typescript
 const result = __processor__.detectMaliciousPatterns(
   "https://example.com?user=admin' OR '1'='1",
-  { sensitivity: 1.0 }
+  { sensitivity: 1.0 },
 );
 console.log(result); // Detailed malicious pattern analysis
 ```
@@ -711,7 +703,7 @@ The library detects all supported encoding types, including nested encodings, wi
 ## More Information
 
 - Detailed `checkUrl` and `asyncCheckUrl` documentation: [checkUrlMethod.md](./docs/checkUrlMethod.md)
-- Full documentation: [lab.nehonix.space](https://lab.nehonix.space)
+- Full documentation: [lab.nehonix.com](https://lab.nehonix.com)
 - Changelog: [changelog.md](./docs/changelog.md)
 - Previous versions:
   - [v2.1.2](./docs/readme-v2.1.2.md)

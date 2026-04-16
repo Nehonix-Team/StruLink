@@ -479,12 +479,12 @@ export interface UrlValidationOptions {
    * a comparison operator, and a value to compare against. If provided, the URL is validated
    * against each rule, and the results are reported in the UrlCheckResult.
    * @example
-   * // Validate that the hostname is 'nehonix.space' and the pathname is '/api'
+   * // Validate that the hostname is 'nehonix.com' and the pathname is '/api'
    * const options: UrlValidationOptions = {
    *   customValidations: [
-   *     ['hostname', '===', 'nehonix.space'],
+   *     ['hostname', '===', 'nehonix.com'],
    *     ['pathname', '===', '/api'],
-   *     ['literal', '!=', 'nehonix.space'] // Compare a literal value (e.g., URL string)
+   *     ['literal', '!=', 'nehonix.com'] // Compare a literal value (e.g., URL string)
    *   ]
    * };
    */
@@ -494,8 +494,8 @@ export interface UrlValidationOptions {
    * The value to use as the left operand for 'literal' comparisons in customValidations.
    * Required if any rule uses 'literal' as the component.
    * @example
-   * // Compare a custom string to 'nehonix.space'
-   * literalValue: 'nehonix.space' // Used for ['literal', '==', 'nehonix.space']
+   * // Compare a custom string to 'nehonix.com'
+   * literalValue: 'nehonix.com' // Used for ['literal', '==', 'nehonix.com']
    * output: true
    */
   literalValue?: string | number;
@@ -517,11 +517,11 @@ export interface UrlValidationOptions {
  * @property {comparisonOperator} 1 - The operator to use for the comparison (e.g., '===', '==').
  * @property {string} 2 - The value to compare against.
  * @example
- * // Rule to check if hostname is 'nehonix.space'
- * const rule: customValidations = ['hostname', '===', 'nehonix.space'];
+ * // Rule to check if hostname is 'nehonix.com'
+ * const rule: customValidations = ['hostname', '===', 'nehonix.com'];
  * @example
  * // Rule for literal comparison
- * const literalRule: customValidations = ['literal', '!=', 'nehonix.space'];
+ * const literalRule: customValidations = ['literal', '!=', 'nehonix.com'];
  */
 export type ComparisonRule = [
   ValidUrlComponents | custumValidUriComponent,
@@ -597,12 +597,12 @@ export interface UrlCheckResult {
      * // Example result for custom validations
      * {
      *   isValid: true,
-     *   message: "Validation passed: hostname === nehonix.space; Validation passed: pathname === /api",
+     *   message: "Validation passed: hostname === nehonix.com; Validation passed: pathname === /api",
      *   results: [
      *     {
      *       isValid: true,
-     *       message: "Validation passed: hostname === nehonix.space",
-     *       rule: ["hostname", "===", "nehonix.space"]
+     *       message: "Validation passed: hostname === nehonix.com",
+     *       rule: ["hostname", "===", "nehonix.com"]
      *     },
      *     {
      *       isValid: true,

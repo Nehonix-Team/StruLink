@@ -227,7 +227,7 @@ export interface IStruLink {
   decode(
     input: string,
     encodingType: ENC_TYPE,
-    maxRecursionDepth?: number
+    maxRecursionDepth?: number,
   ): string;
 
   /**
@@ -513,12 +513,12 @@ export interface UrlValidationOptions {
    * a comparison operator, and a value to compare against. If provided, the URL is validated
    * against each rule, and the results are reported in the UrlCheckResult.
    * @example
-   * // Validate that the hostname is 'nehonix.space' and the pathname is '/api'
+   * // Validate that the hostname is 'nehonix.com' and the pathname is '/api'
    * const options: UrlValidationOptions = {
    *   customValidations: [
-   *     ['hostname', '===', 'nehonix.space'],
+   *     ['hostname', '===', 'nehonix.com'],
    *     ['pathname', '===', '/api'],
-   *     ['literal', '!=', 'nehonix.space'] // Compare a literal value (e.g., URL string)
+   *     ['literal', '!=', 'nehonix.com'] // Compare a literal value (e.g., URL string)
    *   ]
    * };
    */
@@ -528,13 +528,13 @@ export interface UrlValidationOptions {
    * The value to use as the left operand for 'literal' comparisons in customValidations.
    * Required if any rule uses 'literal' as the component.
    * @example
-   * // Compare a custom string to 'nehonix.space'
-   * literalValue: 'nehonix.space' // Used for ['literal', '==', 'nehonix.space']
+   * // Compare a custom string to 'nehonix.com'
+   * literalValue: 'nehonix.com' // Used for ['literal', '==', 'nehonix.com']
    * output: true
    * With "@this" option, use the URL string itself as the left operand for comparisons.
    * @example
    * input = "https://google.com"
-   * literalValue: '@this' // Used for ['literal', '==', 'nehonix.space']
+   * literalValue: '@this' // Used for ['literal', '==', 'nehonix.com']
    * output: false
    */
   literalValue?: "@this" | string | number;
@@ -585,16 +585,16 @@ export type AsyncUrlValidationOptFeature = {
  * @property {comparisonOperator} 1 - The operator to use for the comparison (e.g., '===', '==').
  * @property {string} 2 - The value to compare against.
  * @example
- * // Rule to check if hostname is 'nehonix.space'
- * const rule: customValidations = ['hostname', '===', 'nehonix.space'];
+ * // Rule to check if hostname is 'nehonix.com'
+ * const rule: customValidations = ['hostname', '===', 'nehonix.com'];
  * @example
  * // Rule for literal comparison
- * const literalRule: customValidations = ['literal', '!=', 'nehonix.space'];
+ * const literalRule: customValidations = ['literal', '!=', 'nehonix.com'];
  */
 export type ComparisonRule = [
   ValidUrlComponents | custumValidUriComponent,
   comparisonOperator,
-  string | number
+  string | number,
 ];
 
 export type ValidUrlComponents =
@@ -665,12 +665,12 @@ export interface UrlCheckResult {
      * // Example result for custom validations
      * {
      *   isValid: true,
-     *   message: "Validation passed: hostname === nehonix.space; Validation passed: pathname === /api",
+     *   message: "Validation passed: hostname === nehonix.com; Validation passed: pathname === /api",
      *   results: [
      *     {
      *       isValid: true,
-     *       message: "Validation passed: hostname === nehonix.space",
-     *       rule: ["hostname", "===", "nehonix.space"]
+     *       message: "Validation passed: hostname === nehonix.com",
+     *       rule: ["hostname", "===", "nehonix.com"]
      *     },
      *     {
      *       isValid: true,
@@ -952,8 +952,8 @@ export interface UriHandlerInterface {
    * @returns The decoded value.
    * @example
    * ```typescript
-   * const decoded = StruLink.autoDetectAndDecode("https://nehonix.space?test=dHJ1ZQ==");
-   * console.log(decoded.val()); // https://nehonix.space?test=true
+   * const decoded = StruLink.autoDetectAndDecode("https://nehonix.com?test=dHJ1ZQ==");
+   * console.log(decoded.val()); // https://nehonix.com?test=true
    * ```
    */
   val: () => string;
@@ -962,7 +962,7 @@ export interface UriHandlerInterface {
    * @returns An array of decoding steps.
    * @example
    * ```typescript
-   * const decoded = StruLink.autoDetectAndDecode("https://nehonix.space?test=dHJ1ZQ==");
+   * const decoded = StruLink.autoDetectAndDecode("https://nehonix.com?test=dHJ1ZQ==");
    * console.log(decoded.steps()); // [{ step: 1, encoding: "base64", decoded: "true", confidence: 1 }]
    * ```
    */
@@ -977,7 +977,7 @@ export interface UriHandlerInterface {
    * @returns The number of iterations performed.
    * @example
    * ```typescript
-   * const decoded = StruLink.autoDetectAndDecode("https://nehonix.space?test=dHJ1ZQ==");
+   * const decoded = StruLink.autoDetectAndDecode("https://nehonix.com?test=dHJ1ZQ==");
    * console.log(decoded.iterations()); // 1
    * ```
    */

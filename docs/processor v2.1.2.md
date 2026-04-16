@@ -1,7 +1,7 @@
 # StruLink
 
 A comprehensive TypeScript library for detecting, decoding, and encoding various URI encoding schemes. This utility is designed for security testing, web application penetration testing, and analyzing potential attacks, with powerful auto-detection and decoding capabilities.
-See full documentation at [lab.nehonix.space](https://lab.nehonix.space)
+See full documentation at [lab.nehonix.com](https://lab.nehonix.com)
 
 ## Table of Contents
 
@@ -79,7 +79,6 @@ Click to [see full doc](./checkUrlMethod.md)!
 Checks whether a string is a valid URI with configurable validation rules.
 
 - **Parameters**:
-
   - `url` - The string to validate (e.g., `https://example.com?test=true`)
   - `options` (optional):
     - `strictMode` (boolean, default: `false`) - Requires a leading slash before query parameters
@@ -128,12 +127,10 @@ Creates a `URL` object from a URI string.
 Detects the encoding type(s) of a URI string, with optional recursion for nested encodings.
 
 - **Parameters**:
-
   - `input` - The URI string to analyze
   - `depth` (optional) - Recursion depth for nested encodings
 
 - **Returns**: An object containing:
-
   - `mostLikely`: The most probable encoding type
   - `confidence`: Confidence score (0-1)
   - `nestedTypes`: Array of detected nested encoding types
@@ -149,7 +146,6 @@ Detects the encoding type(s) of a URI string, with optional recursion for nested
 **Recommended**: Automatically detects and decodes a URI string to plaintext with advanced intelligence and performance. This method is smarter and more powerful than the deprecated `detectAndDecode`, handling complex and nested encodings efficiently.
 
 - **Parameters**:
-
   - `input` - The URI string to decode
   - `maxIterations` (optional, default: `10`) - Maximum decoding iterations to prevent infinite loops
 
@@ -158,7 +154,7 @@ Detects the encoding type(s) of a URI string, with optional recursion for nested
 - **Example**:
   ```typescript
   const decoded = StruLink.autoDetectAndDecode(
-    "https://example.com?test=dHJ1ZQ=="
+    "https://example.com?test=dHJ1ZQ==",
   );
   console.log(decoded); // https://example.com?test=true
   ```
@@ -172,7 +168,6 @@ Automatically detects and decodes a URI string.
 - **Parameters**: `input` - The URI string to decode
 
 - **Returns**: An object containing:
-
   - `val`: The decoded string
   - `encodingType`: The detected encoding type
   - `confidence`: Confidence score (0-1)
@@ -188,7 +183,6 @@ Automatically detects and decodes a URI string.
 Encodes a string using a specific encoding type.
 
 - **Parameters**:
-
   - `input` - The string to encode
   - `encodingType` - The encoding type (e.g., `percentEncoding`, `base64`, `rot13`)
 
@@ -205,7 +199,6 @@ Encodes a string using a specific encoding type.
 Decodes a string using a specific encoding type, with optional recursion for nested encodings.
 
 - **Parameters**:
-
   - `input` - The string to decode
   - `encodingType` - The encoding type (e.g., `percentEncoding`, `base64`, `jwt`)
   - `maxRecursionDepth` (optional) - Maximum recursion depth for nested decoding
@@ -225,7 +218,6 @@ Analyzes a URL and identifies potentially vulnerable parameters.
 - **Parameters**: `url` - The URL to analyze
 
 - **Returns**: An object containing:
-
   - `url`: The base URL
   - `params`: Object with query parameters and their risk assessments
 

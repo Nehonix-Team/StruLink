@@ -19,7 +19,7 @@
     "README.md",
     "LICENSE"
   ],
-  "homepage": "https://lab.nehonix.space",
+  "homepage": "https://lab.nehonix.com",
   "keywords": [
     "uri",
     "url",
@@ -68,8 +68,8 @@
   },
   "author": {
     "name": "Nehonix",
-    "whatsapp": "https://s.nehonix.space/QBo0KpCl",
-    "url": "https://nehonix.space"
+    "whatsapp": "https://s.nehonix.com/QBo0KpCl",
+    "url": "https://nehonix.com"
   },
   "dependencies": {
     "idna-uts46-hx": "^6.0.8"

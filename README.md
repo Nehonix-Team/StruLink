@@ -1,20 +1,21 @@
 # StruLink
 
-> **⚠️ DEPRECATION NOTICE**
-> 
+> **DEPRECATION NOTICE**
+>
 > **[NehonixURIProcessor](https://github.com/nehonix/nehonixUriProcessor) will be deprecated in December 2025.**
-> 
-> This is the **official successor** - a simplified, refocused version with:
-> - ✅ Pure URL/URI and String encoding, decoding, validation utilities
-> - ✅ Zero framework dependencies (no Express/React)
-> - ✅ Lightweight (only 1 dependency)
-> - ❌ Removed: AI/ML features, Python microservices, framework integrations
-> 
-> **Migration**: If you need Express/React integrations or ML features, continue using [nehonix/nehonixUriProcessor](https://github.com/nehonix/nehonixUriProcessor) until December 2025. Otherwise, migrate to StruLink now.
+>
+> StruLink is the official successor. It is a simplified, refocused version featuring:
+>
+> - Pure URL/URI and String encoding, decoding, and validation utilities.
+> - Zero framework dependencies (no Express or React logic).
+> - A minimal footprint (only 1 runtime dependency).
+> - Note: AI/ML features, Python microservices, and framework integrations have been removed.
+>
+> **Migration Plan**: If your project relies on Express/React integrations or machine learning features, continue using [nehonix/nehonixUriProcessor](https://github.com/nehonix/nehonixUriProcessor) until December 2025. For pure utility usage, migrate to StruLink.
 
 ---
 
-A focused TypeScript library for URL/URI and String encoding, decoding, validation, and parsing. Designed for developers who need powerful URL manipulation utilities without framework dependencies.
+StruLink is a focused TypeScript library for URL/URI and string encoding, decoding, validation, and parsing. It is designed for developers who require high-performance URL manipulation utilities without the overhead of framework dependencies.
 
 [![npm version](https://img.shields.io/npm/v/strulink.svg)](https://www.npmjs.com/package/strulink)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -26,6 +27,14 @@ A focused TypeScript library for URL/URI and String encoding, decoding, validati
 ## Quick Start
 
 ### Installation
+
+**Recommended for TypeScript projects:**
+
+```bash
+xfpm install strulink
+```
+
+Alternative methods:
 
 ```bash
 npm install strulink
@@ -41,27 +50,33 @@ yarn add strulink
 import { StruLink as __strl__ } from "strulink";
 
 // Validate and decode URL
-const result = await __strl__.asyncCheckUrl("https://example.com?data=SGVsbG8=");
+const result = await __strl__.asyncCheckUrl(
+  "https://example.com?data=SGVsbG8=",
+);
 console.log(result.isValid); // true
 
 // Auto-detect and decode
-const decoded = __strl__.autoDetectAndDecode("https://example.com?data=SGVsbG8gV29ybGQ=");
+const decoded = __strl__.autoDetectAndDecode(
+  "https://example.com?data=SGVsbG8gV29ybGQ=",
+);
 console.log(decoded); // https://example.com?data=Hello World
 
 // Detect malicious patterns
-const analysis = __strl__.detectMaliciousPatterns("https://example.com?user=admin' OR '1'='1");
+const analysis = __strl__.detectMaliciousPatterns(
+  "https://example.com?user=admin' OR '1'='1",
+);
 console.log(analysis.isMalicious); // true
 ```
 
 ## Features
 
-- **🔍 URL Validation**: Validate URIs with customizable rules
-- **🔓 Auto-Detection & Decoding**: Decode complex URI encodings automatically
-- **🎨 Multiple Encodings**: Base64, percent encoding, hex, punycode, JWT, and more
-- **🛡️ Security Analysis**: Detect SQL injection, XSS, path traversal patterns
-- **🌐 Internationalized URIs**: Full punycode support
-- **⚡ Lightweight**: Only 1 runtime dependency
-- **📦 Zero Config**: Works out of the box
+- **URL Validation**: Validate URIs against customizable rules.
+- **Auto-Detection & Decoding**: Decode complex URI parameter encodings automatically.
+- **Multiple Encodings Supported**: Base64, percent encoding, hex, punycode, JWT, and more.
+- **Security Analysis**: Detect SQL injection, XSS, and path traversal patterns.
+- **Internationalized URIs**: Complete punycode support.
+- **Lightweight Architecture**: Single runtime dependency.
+- **Zero Configuration**: Ready for use without additional setup.
 
 ## Supported Encoding Types
 
@@ -69,66 +84,64 @@ console.log(analysis.isMalicious); // true
 
 ## Documentation
 
-📚 **[Full Documentation](./docs/web/index.html)** - Complete API reference and guides
+**[Complete Documentation](./docs/web/index.html)** - Comprehensive API references and developer guides.
 
-### Quick Links
+### Guide References
 
 - [API Reference](./docs/API.md) - Detailed method documentation
-- [Encoding Guide](./docs/ENCODING.md) - All supported encoding types
-- [Security Features](./docs/SECURITY.md) - Security analysis and pattern detection
+- [Encoding Guide](./docs/ENCODING.md) - Supported encoding types and examples
+- [Security Features](./docs/SECURITY.md) - Analysis and pattern detection mechanisms
 - [Examples](./docs/EXAMPLES.md) - Common use cases and code samples
-- [Migration Guide](./docs/MIGRATION.md) - Migrating from NehonixURIProcessor
+- [Migration Guide](./docs/MIGRATION.md) - Migration steps from NehonixURIProcessor
 
-## Core API
+## Core API Reference
 
 ```typescript
 // Validation
-__strl__.checkUrl(url, options)
-__strl__.asyncCheckUrl(url, options)
-__strl__.isValidUri(url, options)
+__strl__.checkUrl(url, options);
+__strl__.asyncCheckUrl(url, options);
+__strl__.isValidUri(url, options);
 
-// Encoding/Decoding
-__strl__.encode(input, encodingType)
-__strl__.decode(input, encodingType)
-__strl__.autoDetectAndDecode(input)
-__strl__.detectEncoding(input)
+// Encoding and Decoding
+__strl__.encode(input, encodingType);
+__strl__.decode(input, encodingType);
+__strl__.autoDetectAndDecode(input);
+__strl__.detectEncoding(input);
 
-// Security
-__strl__.detectMaliciousPatterns(input, options)
-__strl__.scanUrl(url)
-__strl__.sanitizeInput(input)
+// Security Analysis
+__strl__.detectMaliciousPatterns(input, options);
+__strl__.scanUrl(url);
+__strl__.sanitizeInput(input);
 
-// Analysis
-__strl__.analyzeURL(url)
-__strl__.needsDeepScan(input)
+// General Analysis
+__strl__.analyzeURL(url);
+__strl__.needsDeepScan(input);
 ```
 
-## Why StruLink?
+## Comparison: StruLink vs NehonixURIProcessor
 
-| Feature | StruLink | NehonixURIProcessor |
-|---------|----------|---------------------|
-| URL Encoding/Decoding | ✅ | ✅ |
-| Security Analysis | ✅ | ✅ |
-| Framework Integrations | ❌ | ✅ (Express/React) |
-| AI/ML Features | ❌ | ✅ |
-| Dependencies | 1 | 12+ |
-| Bundle Size | ~50KB | ~2MB+ |
-| Status | ✅ Active | ⚠️ Deprecated Dec 2025 |
+| Feature                 | StruLink     | NehonixURIProcessor      |
+| ----------------------- | ------------ | ------------------------ |
+| URL Encoding & Decoding | Supported    | Supported                |
+| Security Analysis       | Supported    | Supported                |
+| Framework Integrations  | Not Included | Included (Express/React) |
+| AI & ML Features        | Not Included | Included                 |
+| Dependencies            | 1            | 12+                      |
+| Bundle Size             | ~50KB        | ~2MB+                    |
+| Status                  | Active       | Deprecated Dec 2025      |
 
-## Contributing
+## Contribution Guidelines
 
-Contributions are welcome! Please read our [Contributing Guide](./CONTRIBUTING.md) first.
+Contributions to the project are welcome. Please refer to our [Contributing Guide](./CONTRIBUTING.md) prior to submitting pull requests.
 
 ## License
 
-MIT © [Nehonix Team](https://nehonix.space)
+MIT Copyright (c) [Nehonix Team](https://nehonix.space)
 
-## Links
+## Key Links
 
-- [GitHub](https://github.com/Nehonix-Team/StruLink)
-- [npm](https://www.npmjs.com/package/strulink)
-- [Documentation](./docs/web/index.html)
-- [Issues](https://github.com/Nehonix-Team/StruLink/issues)
+- [GitHub Repository](https://github.com/Nehonix-Team/StruLink)
+- [NPM Package](https://www.npmjs.com/package/strulink)
+- [Official Documentation](./docs/web/index.html)
+- [Issue Tracker](https://github.com/Nehonix-Team/StruLink/issues)
 - [Changelog](./docs/changelog.md)
-
----

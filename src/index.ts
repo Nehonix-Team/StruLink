@@ -9,23 +9,23 @@ import { NehonixSafetyLayer } from "./utils/NehonixSafetyLayer";
 /**
  * A comprehensive library for detecting, encoding, and decoding URI strings, designed for security testing and attack analysis.
  * @author nehonix
- * @version 2.1.2 
+ * @version 2.1.2
  * @since 12/04/2025
  * The `StruLink` class provides methods to analyze URLs, generate encoding variants for Web Application Firewall (WAF) bypass testing,
  * and automatically detect and decode various URI encodings. It supports a range of encoding types, including percent-encoding, Base64, and hexadecimal,
  * making it suitable for penetration testing, vulnerability assessment, and secure data processing.
  *
- * For detailed documentation on specific methods, see the [changelog](https://lab.nehonix.space/nehonix_viewer/_doc/StruLink/changelog) and method-specific guides.
+ * For detailed documentation on specific methods, see the [changelog](https://lab.nehonix.com/nehonix_viewer/_doc/StruLink/changelog) and method-specific guides.
  *
  * @example
  * ```typescript
  * // Check if a string is a valid URI
- * const isValid = StruLink.isValidUri("https://nehonix.space?test=true");
+ * const isValid = StruLink.isValidUri("https://nehonix.com?test=true");
  * console.log(isValid); // true
  *
  * // Decode a Base64-encoded URI parameter
- * const decoded = StruLink.autoDetectAndDecode("https://nehonix.space?test=dHJ1ZQ==");
- * console.log(decoded); // https://nehonix.space?test=true
+ * const decoded = StruLink.autoDetectAndDecode("https://nehonix.com?test=dHJ1ZQ==");
+ * console.log(decoded); // https://nehonix.com?test=true
  *
  * // Generate WAF bypass variants
  * const variants = StruLink.generateWAFBypassVariants("<script>");
@@ -58,14 +58,14 @@ class StruLink {
    * This method parses the URL, extracts its query parameters, and evaluates them for common security vulnerabilities,
    * such as parameters commonly used for SQL injection, XSS, or other attacks.
    *
-   * @param url - The URL to analyze (e.g., `https://nehonix.space?user=admin&pass=123`).
+   * @param url - The URL to analyze (e.g., `https://nehonix.com?user=admin&pass=123`).
    * @returns An object containing the URL's components (e.g., domain, path, parameters) and a vulnerability assessment
    *          for each parameter, including potential attack vectors.
    * @example
    * ```typescript
-   * const analysis = StruLink.analyzeURL("https://nehonix.space?user=admin");
+   * const analysis = StruLink.analyzeURL("https://nehonix.com?user=admin");
    * console.log(analysis);
-   * // Output: { url: "https://nehonix.space", params: { user: { value: "admin", risks: ["sql_injection", "xss"] } }, ... }
+   * // Output: { url: "https://nehonix.com", params: { user: { value: "admin", risks: ["sql_injection", "xss"] } }, ... }
    * ```
    */
   static analyzeURL(...p: Parameters<typeof sr.analyzeURL>) {
@@ -127,16 +127,16 @@ class StruLink {
    * or the maximum recursion depth is met. Ideal for decoding complex or nested URI encodings.
    *
    * @version 1.1.1
-   * @param input - The URI string to decode (e.g., `https://nehonix.space?test=dHJ1ZQ==`).
+   * @param input - The URI string to decode (e.g., `https://nehonix.com?test=dHJ1ZQ==`).
    * @param [maxIterations=10] - Maximum number of decoding iterations to prevent infinite loops.
-   * @returns The decoded string in plaintext (e.g., `https://nehonix.space?test=true`).
+   * @returns The decoded string in plaintext (e.g., `https://nehonix.com?test=true`).
    * @example
    * ```typescript
-   * const decoded = StruLink.autoDetectAndDecode("https://nehonix.space?test=dHJ1ZQ==");
-   * console.log(decoded.val()); // https://nehonix.space?test=true
+   * const decoded = StruLink.autoDetectAndDecode("https://nehonix.com?test=dHJ1ZQ==");
+   * console.log(decoded.val()); // https://nehonix.com?test=true
    *
    * const nested = StruLink.autoDetectAndDecode("aHR0cHM6Ly9leGFtcGxlLmNvbQ==");
-   * console.log(nested.val()); // https://nehonix.space
+   * console.log(nested.val()); // https://nehonix.com
    * ```
    */
   static autoDetectAndDecode(
@@ -169,7 +169,7 @@ class StruLink {
    * is valid based on the provided options. It supports validation of protocols, domains, TLDs, query parameters, and
    * encoding, with additional support for localhost when enabled.
    *
-   * @param url - The URL string to validate (e.g., `https://nehonix.space?test=true`).
+   * @param url - The URL string to validate (e.g., `https://nehonix.com?test=true`).
    * @param [options] - Optional configuration for validation rules.
    * @param [options.strictMode=false] - If `true`, requires a leading slash before query parameters.
    * @param [options.allowUnicodeEscapes=true] - If `true`, allows Unicode escape sequences in query parameters.
@@ -186,7 +186,7 @@ class StruLink {
    * @returns `true` if the URL is valid according to the specified options, `false` otherwise.
    * @example
    * ```typescript
-   * const isValid = StruLink.isValidUrl("https://nehonix.space?test=true");
+   * const isValid = StruLink.isValidUrl("https://nehonix.com?test=true");
    * console.log(isValid); // true
    *
    * const isLocalhostValid = StruLink.isValidUrl("http://localhost:8080", { allowLocalhost: true });
@@ -233,7 +233,7 @@ class StruLink {
   static decode(
     input: string,
     encodingType: ENC_TYPE | DEC_FEATURE_TYPE,
-    maxRecursionDepth?: number
+    maxRecursionDepth?: number,
   ) {
     return dec.decode({
       input,
@@ -249,14 +249,14 @@ class StruLink {
    * structured access to the URL's components (e.g., protocol, hostname, pathname, search parameters). It is useful
    * for further URL manipulation or analysis within the `StruLink` ecosystem.
    *
-   * @param uri - The URI string to parse (e.g., `https://nehonix.space?test=true`).
+   * @param uri - The URI string to parse (e.g., `https://nehonix.com?test=true`).
    * @returns A `URL` object representing the parsed URI.
    * @throws Throws a `TypeError` if the URI string is invalid or cannot be parsed by the `URL` constructor.
    * @example
    * ```typescript
-   * const urlObj = StruLink.createUrl("https://nehonix.space?test=true");
-   * console.log(urlObj.href); // https://nehonix.space?test=true
-   * console.log(urlObj.hostname); // nehonix.space
+   * const urlObj = StruLink.createUrl("https://nehonix.com?test=true");
+   * console.log(urlObj.href); // https://nehonix.com?test=true
+   * console.log(urlObj.hostname); // nehonix.com
    * console.log(urlObj.searchParams.get("test")); // true
    *
    * // Handling invalid URI
@@ -281,7 +281,7 @@ class StruLink {
    * The returned object includes an overall validity flag and specific details about each check, making it ideal for
    * debugging, security analysis, or detailed URL validation reporting.
    *
-   * @param url - The URL string to check (e.g., `https://nehonix.space?test=true`).
+   * @param url - The URL string to check (e.g., `https://nehonix.com?test=true`).
    * @param [options] - Optional configuration for validation rules.
    * @param [options.strictMode=false] - If `true`, requires a leading slash before query parameters (e.g., `/?query`).
    *                                    If `false`, allows query parameters without a leading slash (e.g., `?query`).
@@ -312,7 +312,7 @@ class StruLink {
    * @throws Does not throw errors; instead, parsing errors are reported in the `validationDetails.parsing` property.
    * @example
    * ```typescript
-   * const result = StruLink.checkUrl("https://nehonix.space?test=true");
+   * const result = StruLink.checkUrl("https://nehonix.com?test=true");
    * console.log(result);
    * // Output: {
    * //   isValid: true,
@@ -325,7 +325,7 @@ class StruLink {
    * // }
    *
    * // Invalid URL with unencoded spaces
-   * const invalidResult = StruLink.checkUrl("https://nehonix.space?test=thank you");
+   * const invalidResult = StruLink.checkUrl("https://nehonix.com?test=thank you");
    * console.log(invalidResult);
    * // Output: {
    * //   isValid: false,
@@ -339,7 +339,7 @@ class StruLink {
    *
    * // URL with duplicate parameters
    * const duplicateResult = StruLink.checkUrl(
-   *   "https://nehonix.space?p1=a&p1=b",
+   *   "https://nehonix.com?p1=a&p1=b",
    *   { rejectDuplicateParams: true }
    * );
    * console.log(duplicateResult);
@@ -353,7 +353,7 @@ class StruLink {
    *
    * // URL with strict encoding violation
    * const encodingResult = StruLink.checkUrl(
-   *   "https://nehonix.space?test=%25",
+   *   "https://nehonix.com?test=%25",
    *   { strictParamEncoding: true }
    * );
    * console.log(encodingResult);
