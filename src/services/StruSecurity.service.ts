@@ -40,6 +40,100 @@ export class NSS {
   private static RFI_PATTERNS = PATTERNS.RFI_PATTERNS;
   private static resultCache: Map<string, MaliciousPatternResult> = new Map();
 
+  private static isPatternEnabled(
+    type: MaliciousPatternType,
+    options: Required<MaliciousPatternOptions>,
+  ): boolean {
+    if (options.enabledPatternTypes.length > 0) {
+      return (
+        options.enabledPatternTypes.includes(type) &&
+        !options.ignorePatterns.includes(type)
+      );
+    }
+    return !options.ignorePatterns.includes(type);
+  }
+
+  private static getEffectivePatterns(
+    type: MaliciousPatternType,
+    defaultPatterns: RegExp[],
+    options: Required<MaliciousPatternOptions>,
+  ): RegExp[] {
+    let patterns = [...defaultPatterns];
+    const override = options.patternOverrides.find((override) => {
+      return override.type === type;
+    });
+
+    if (override) {
+      if (override.remove?.length) {
+        patterns = patterns.filter(
+          (pattern) =>
+            !override.remove!.some(
+              (removePattern) =>
+                removePattern.toString() === pattern.toString(),
+            ),
+        );
+      }
+
+      if (override.replace?.length) {
+        patterns = [...override.replace];
+      }
+
+      if (override.add?.length) {
+        patterns.push(...override.add);
+      }
+    }
+
+    return patterns;
+  }
+
+  private static isAllowlistedParameter(
+    paramName: string,
+    paramValue: string,
+    options: Required<MaliciousPatternOptions>,
+  ): boolean {
+    const parameterNames = options.allowlist.parameterNames ?? [];
+    const parameterValuePatterns =
+      options.allowlist.parameterValuePatterns ?? [];
+
+    if (parameterNames.includes(paramName)) {
+      return true;
+    }
+
+    for (const pattern of parameterValuePatterns) {
+      if (pattern.test(paramValue)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  private static detectPatternsForType(
+    input: string,
+    type: MaliciousPatternType,
+    defaultPatterns: RegExp[],
+    description: string,
+    severity: "low" | "medium" | "high",
+    results: DetectedPattern[],
+    options: Required<MaliciousPatternOptions>,
+  ): void {
+    if (!this.isPatternEnabled(type, options)) {
+      return;
+    }
+
+    const patterns = this.getEffectivePatterns(type, defaultPatterns, options);
+
+    this.checkPatterns(
+      input,
+      patterns,
+      type,
+      description,
+      severity,
+      results,
+      options,
+    );
+  }
+
   private static isSafeHighEntropy(input: string): boolean {
     // JWT pattern
     if (/^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/.test(input)) {
@@ -67,7 +161,7 @@ export class NSS {
    */
   static detectMaliciousPatterns(
     receivedInput: string,
-    options: MaliciousPatternOptions = {}
+    options: MaliciousPatternOptions = {},
   ): MaliciousPatternResult {
     try {
       // Set default options
@@ -75,8 +169,19 @@ export class NSS {
         minScore: options.minScore ?? 50,
         debug: options.debug ?? false,
         ignorePatterns: options.ignorePatterns ?? [],
+        enabledPatternTypes: options.enabledPatternTypes ?? [],
         sensitivity: options.sensitivity ?? 1.0,
         customPatterns: options.customPatterns ?? [],
+        patternOverrides: options.patternOverrides ?? [],
+        allowlist: {
+          domains: options.allowlist?.domains ?? [],
+          hostnames: options.allowlist?.hostnames ?? [],
+          parameterNames: options.allowlist?.parameterNames ?? [],
+          parameterValuePatterns:
+            options.allowlist?.parameterValuePatterns ?? [],
+          protocols: options.allowlist?.protocols ?? [],
+          tlds: options.allowlist?.tlds ?? [],
+        },
         enableContextualAnalysis: options.enableContextualAnalysis ?? true,
         enableEntropyAnalysis: options.enableEntropyAnalysis ?? true,
         enableStatisticalAnalysis: options.enableStatisticalAnalysis ?? true,
@@ -88,6 +193,13 @@ export class NSS {
           fragment: 1.3,
         },
         characterSet: options.characterSet ?? "all",
+        advanced: {
+          maxEncodingLayers: options.advanced?.maxEncodingLayers ?? 5,
+          entropyThreshold: options.advanced?.entropyThreshold ?? 4.5,
+          scoring: options.advanced?.scoring ?? {},
+          contextual: options.advanced?.contextual ?? {},
+          anomaly: options.advanced?.anomaly ?? {},
+        },
       };
       const parsedInput = NDS.decodeAnyToPlaintext(receivedInput).val();
 
@@ -99,7 +211,7 @@ export class NSS {
       const normalizedInput = parsedInput.normalize("NFC");
       // Use normalized input for checks
       const inputsToCheck = [normalizedInput, parsedInput].filter(
-        (i, idx, arr) => i !== arr[idx - 1]
+        (i, idx, arr) => i !== arr[idx - 1],
       );
       let decodedInput = "";
       let totalScore = 0;
@@ -110,7 +222,10 @@ export class NSS {
         const input = NDS.decodeAnyToPlaintext(ipt).val();
         // Store all detected patterns
         decodedInput = input;
-        const encodingLayers = this.detectEncodingLayers(input);
+        const encodingLayers = this.detectEncodingLayers(
+          input,
+          opts.advanced.maxEncodingLayers,
+        );
         if (encodingLayers > 0) {
           let tempInput = input;
           for (let i = 0; i < encodingLayers; i++) {
@@ -133,7 +248,7 @@ export class NSS {
                 /\\u([0-9a-fA-F]{4})/g,
                 (_, hex) => {
                   return String.fromCodePoint(parseInt(hex, 16));
-                }
+                },
               );
             } catch {}
             decodedInput = tempInput;
@@ -142,7 +257,7 @@ export class NSS {
 
         if (opts.enableEntropyAnalysis && !this.isSafeHighEntropy(input)) {
           const entropyScore = this.calculateEntropy(input);
-          if (entropyScore > 4.5) {
+          if (entropyScore > (opts.advanced.entropyThreshold ?? 4.5)) {
             detectedPatterns.push({
               type: MaliciousPatternType.ENCODED_PAYLOAD,
               pattern: "high_entropy",
@@ -160,218 +275,155 @@ export class NSS {
           }
         }
 
-        // Check for SQL injection patterns
-        if (!opts.ignorePatterns.includes(MaliciousPatternType.SQL_INJECTION)) {
-          this.checkPatterns(
-            input,
-            this.SQL_INJECTION_PATTERNS,
-            MaliciousPatternType.SQL_INJECTION,
-            "SQL injection attempt",
-            "high",
-            detectedPatterns,
-            opts
-          );
-        }
+        this.detectPatternsForType(
+          input,
+          MaliciousPatternType.SQL_INJECTION,
+          this.SQL_INJECTION_PATTERNS,
+          "SQL injection attempt",
+          "high",
+          detectedPatterns,
+          opts,
+        );
 
-        // Check for XSS patterns
-        if (!opts.ignorePatterns.includes(MaliciousPatternType.XSS)) {
-          this.checkPatterns(
-            input,
-            this.XSS_PATTERNS,
-            MaliciousPatternType.XSS,
-            "Cross-site scripting attempt",
-            "high",
-            detectedPatterns,
-            opts
-          );
-        }
-        // Check for RFI patterns
-        if (!opts.ignorePatterns.includes(MaliciousPatternType.RFI)) {
-          this.checkPatterns(
-            input,
-            this.RFI_PATTERNS,
-            MaliciousPatternType.RFI,
-            "Remote file inclusion attempt",
-            "high",
-            detectedPatterns,
-            opts
-          );
-        }
-        // Check for command injection patterns
-        if (
-          !opts.ignorePatterns.includes(MaliciousPatternType.COMMAND_INJECTION)
-        ) {
-          this.checkPatterns(
-            input,
-            this.COMMAND_INJECTION_PATTERNS,
-            MaliciousPatternType.COMMAND_INJECTION,
-            "Command injection attempt",
-            "high",
-            detectedPatterns,
-            opts
-          );
-        }
+        this.detectPatternsForType(
+          input,
+          MaliciousPatternType.XSS,
+          this.XSS_PATTERNS,
+          "Cross-site scripting attempt",
+          "high",
+          detectedPatterns,
+          opts,
+        );
 
-        // Check for path traversal patterns
-        if (
-          !opts.ignorePatterns.includes(MaliciousPatternType.PATH_TRAVERSAL)
-        ) {
-          this.checkPatterns(
-            input,
-            this.PATH_TRAVERSAL_PATTERNS,
-            MaliciousPatternType.PATH_TRAVERSAL,
-            "Path traversal attempt",
-            "high",
-            detectedPatterns,
-            opts
-          );
-        }
+        this.detectPatternsForType(
+          input,
+          MaliciousPatternType.RFI,
+          this.RFI_PATTERNS,
+          "Remote file inclusion attempt",
+          "high",
+          detectedPatterns,
+          opts,
+        );
 
-        // Check for open redirect patterns
-        if (!opts.ignorePatterns.includes(MaliciousPatternType.OPEN_REDIRECT)) {
-          this.checkPatterns(
-            input,
-            this.OPEN_REDIRECT_PATTERNS,
-            MaliciousPatternType.OPEN_REDIRECT,
-            "Open redirect attempt",
-            "medium",
-            detectedPatterns,
-            opts
-          );
-        }
+        this.detectPatternsForType(
+          input,
+          MaliciousPatternType.COMMAND_INJECTION,
+          this.COMMAND_INJECTION_PATTERNS,
+          "Command injection attempt",
+          "high",
+          detectedPatterns,
+          opts,
+        );
 
-        // Check for SSRF patterns
-        if (!opts.ignorePatterns.includes(MaliciousPatternType.SSRF)) {
-          this.checkPatterns(
-            input,
-            this.SSRF_PATTERNS,
-            MaliciousPatternType.SSRF,
-            "Server-side request forgery attempt",
-            "high",
-            detectedPatterns,
-            opts
-          );
-        }
+        this.detectPatternsForType(
+          input,
+          MaliciousPatternType.PATH_TRAVERSAL,
+          this.PATH_TRAVERSAL_PATTERNS,
+          "Path traversal attempt",
+          "high",
+          detectedPatterns,
+          opts,
+        );
 
-        // Check for CRLF injection patterns
-        if (
-          !opts.ignorePatterns.includes(MaliciousPatternType.CRLF_INJECTION)
-        ) {
-          this.checkPatterns(
-            input,
-            this.CRLF_INJECTION_PATTERNS,
-            MaliciousPatternType.CRLF_INJECTION,
-            "CRLF injection attempt",
-            "medium",
-            detectedPatterns,
-            opts
-          );
-        }
+        this.detectPatternsForType(
+          input,
+          MaliciousPatternType.OPEN_REDIRECT,
+          this.OPEN_REDIRECT_PATTERNS,
+          "Open redirect attempt",
+          "medium",
+          detectedPatterns,
+          opts,
+        );
 
-        // Check for template injection patterns
-        if (
-          !opts.ignorePatterns.includes(MaliciousPatternType.TEMPLATE_INJECTION)
-        ) {
-          this.checkPatterns(
-            input,
-            this.TEMPLATE_INJECTION_PATTERNS,
-            MaliciousPatternType.TEMPLATE_INJECTION,
-            "Template injection attempt",
-            "high",
-            detectedPatterns,
-            opts
-          );
-        }
+        this.detectPatternsForType(
+          input,
+          MaliciousPatternType.SSRF,
+          this.SSRF_PATTERNS,
+          "Server-side request forgery attempt",
+          "high",
+          detectedPatterns,
+          opts,
+        );
 
-        // Check for NoSQL injection patterns
-        if (
-          !opts.ignorePatterns.includes(MaliciousPatternType.NOSQL_INJECTION)
-        ) {
-          this.checkPatterns(
-            input,
-            this.NOSQL_INJECTION_PATTERNS,
-            MaliciousPatternType.NOSQL_INJECTION,
-            "NoSQL injection attempt",
-            "high",
-            detectedPatterns,
-            opts
-          );
-        }
+        this.detectPatternsForType(
+          input,
+          MaliciousPatternType.CRLF_INJECTION,
+          this.CRLF_INJECTION_PATTERNS,
+          "CRLF injection attempt",
+          "medium",
+          detectedPatterns,
+          opts,
+        );
 
-        // Check for GraphQL injection patterns
-        if (
-          !opts.ignorePatterns.includes(MaliciousPatternType.GRAPHQL_INJECTION)
-        ) {
-          this.checkPatterns(
-            input,
-            this.GRAPHQL_INJECTION_PATTERNS,
-            MaliciousPatternType.GRAPHQL_INJECTION,
-            "GraphQL injection attempt",
-            "high",
-            detectedPatterns,
-            opts
-          );
-        }
+        this.detectPatternsForType(
+          input,
+          MaliciousPatternType.TEMPLATE_INJECTION,
+          this.TEMPLATE_INJECTION_PATTERNS,
+          "Template injection attempt",
+          "high",
+          detectedPatterns,
+          opts,
+        );
 
-        // Check for encoded payload patterns
-        if (
-          !opts.ignorePatterns.includes(MaliciousPatternType.ENCODED_PAYLOAD)
-        ) {
-          this.checkPatterns(
-            input,
-            this.ENCODED_PAYLOAD_PATTERNS,
-            MaliciousPatternType.ENCODED_PAYLOAD,
-            "Suspicious encoded payload",
-            "medium",
-            detectedPatterns,
-            opts
-          );
-        }
+        this.detectPatternsForType(
+          input,
+          MaliciousPatternType.NOSQL_INJECTION,
+          this.NOSQL_INJECTION_PATTERNS,
+          "NoSQL injection attempt",
+          "high",
+          detectedPatterns,
+          opts,
+        );
 
-        // Check for suspicious TLD patterns
-        if (
-          !opts.ignorePatterns.includes(MaliciousPatternType.SUSPICIOUS_TLD)
-        ) {
-          this.checkPatterns(
-            input,
-            this.SUSPICIOUS_TLD_PATTERNS,
-            MaliciousPatternType.SUSPICIOUS_TLD,
-            "Suspicious TLD detected",
-            "low",
-            detectedPatterns,
-            opts
-          );
-        }
+        this.detectPatternsForType(
+          input,
+          MaliciousPatternType.GRAPHQL_INJECTION,
+          this.GRAPHQL_INJECTION_PATTERNS,
+          "GraphQL injection attempt",
+          "high",
+          detectedPatterns,
+          opts,
+        );
 
-        // Check for homograph attack patterns
-        if (
-          !opts.ignorePatterns.includes(MaliciousPatternType.HOMOGRAPH_ATTACK)
-        ) {
-          this.checkPatterns(
-            input,
-            this.HOMOGRAPH_ATTACK_PATTERNS,
-            MaliciousPatternType.HOMOGRAPH_ATTACK,
-            "Potential homograph attack",
-            "medium",
-            detectedPatterns,
-            opts
-          );
-        }
+        this.detectPatternsForType(
+          input,
+          MaliciousPatternType.ENCODED_PAYLOAD,
+          this.ENCODED_PAYLOAD_PATTERNS,
+          "Suspicious encoded payload",
+          "medium",
+          detectedPatterns,
+          opts,
+        );
 
-        // Check for multi-encoding patterns
-        if (
-          !opts.ignorePatterns.includes(MaliciousPatternType.MULTI_ENCODING)
-        ) {
-          this.checkPatterns(
-            input,
-            this.MULTI_ENCODING_PATTERNS,
-            MaliciousPatternType.MULTI_ENCODING,
-            "Multi-layer encoding detected",
-            "medium",
-            detectedPatterns,
-            opts
-          );
-        }
+        this.detectPatternsForType(
+          input,
+          MaliciousPatternType.SUSPICIOUS_TLD,
+          this.SUSPICIOUS_TLD_PATTERNS,
+          "Suspicious TLD detected",
+          "low",
+          detectedPatterns,
+          opts,
+        );
+
+        this.detectPatternsForType(
+          input,
+          MaliciousPatternType.HOMOGRAPH_ATTACK,
+          this.HOMOGRAPH_ATTACK_PATTERNS,
+          "Potential homograph attack",
+          "medium",
+          detectedPatterns,
+          opts,
+        );
+
+        this.detectPatternsForType(
+          input,
+          MaliciousPatternType.MULTI_ENCODING,
+          this.MULTI_ENCODING_PATTERNS,
+          "Multi-layer encoding detected",
+          "medium",
+          detectedPatterns,
+          opts,
+        );
         // Add encoding layer detection
         if (encodingLayers > 1) {
           detectedPatterns.push({
@@ -388,7 +440,7 @@ export class NSS {
         // Check for suspicious parameter names
         if (
           !opts.ignorePatterns.includes(
-            MaliciousPatternType.SUSPICIOUS_PARAMETER
+            MaliciousPatternType.SUSPICIOUS_PARAMETER,
           )
         ) {
           this.checkSuspiciousParameters(input, detectedPatterns, opts);
@@ -424,7 +476,7 @@ export class NSS {
           contextAnalysis = this.performContextualAnalysis(
             detectedPatterns,
             input,
-            opts
+            opts,
           );
         }
 
@@ -433,7 +485,7 @@ export class NSS {
           const entropyScore = this.calculateEntropy(input);
 
           // High entropy can indicate obfuscation
-          if (entropyScore > 4.5) {
+          if (entropyScore > (opts.advanced.entropyThreshold ?? 4.5)) {
             detectedPatterns.push({
               type: MaliciousPatternType.ENCODED_PAYLOAD,
               pattern: "high_entropy",
@@ -454,20 +506,21 @@ export class NSS {
         // Calculate total score based on detected patterns
         totalScore = this.calculateTotalScore(
           detectedPatterns,
-          opts.sensitivity
+          opts.sensitivity,
+          opts,
         );
       });
 
       // Determine overall confidence level
       const confidence = this.determineConfidence(
         totalScore,
-        detectedPatterns.length
+        detectedPatterns.length,
       );
 
       // Generate appropriate recommendation
       const recommendation = this.generateRecommendation(
         detectedPatterns,
-        totalScore
+        totalScore,
       );
       return {
         isMalicious: totalScore >= opts.minScore,
@@ -499,7 +552,7 @@ export class NSS {
    */
   static async analyzeUrl(
     url: string,
-    options: MaliciousPatternOptions = {}
+    options: MaliciousPatternOptions = {},
   ): Promise<MaliciousPatternResult> {
     try {
       const parsedUrl = new URL(url);
@@ -539,7 +592,7 @@ export class NSS {
             component.value,
             {
               maxIterations: 20,
-            }
+            },
           ).then((res) => res.val());
           // Decode fragment specifically
           if (component.type === "fragment" && valueToCheck.startsWith("#")) {
@@ -622,13 +675,14 @@ export class NSS {
       // Calculate combined score with weighted components
       let totalScore = this.calculateTotalScore(
         detectedPatterns,
-        options.sensitivity || 1.0
+        options.sensitivity || 1.0,
+        options,
       );
 
       // Determine overall confidence level
       const confidence = this.determineConfidence(
         totalScore,
-        detectedPatterns.length
+        detectedPatterns.length,
       );
 
       // Generate contextualAnalysis if multiple components have issues
@@ -640,7 +694,7 @@ export class NSS {
         contextAnalysis = this.performContextualAnalysis(
           detectedPatterns,
           url,
-          options
+          options,
         );
 
         // Add cross-component analysis
@@ -661,7 +715,7 @@ export class NSS {
       // Generate URL-specific recommendation
       const recommendation = this.generateUrlRecommendation(
         detectedPatterns,
-        componentResults
+        componentResults,
       );
 
       return {
@@ -697,7 +751,7 @@ export class NSS {
    */
   private static generateUrlRecommendation(
     detectedPatterns: DetectedPattern[],
-    componentResults: Record<MaliciousComponentType, MaliciousPatternResult>
+    componentResults: Record<MaliciousComponentType, MaliciousPatternResult>,
   ): string {
     if (detectedPatterns.length === 0) {
       return "No suspicious patterns detected in the URL.";
@@ -710,17 +764,17 @@ export class NSS {
     Object.entries(componentResults).forEach(([component, result]) => {
       if (result.detectedPatterns.length > 0) {
         const highSeverity = result.detectedPatterns.some(
-          (p) => p.severity === "high"
+          (p) => p.severity === "high",
         );
 
         if (highSeverity) {
           hasCriticalIssue = true;
           componentIssues.push(
-            `Critical issues found in the ${component} component`
+            `Critical issues found in the ${component} component`,
           );
         } else {
           componentIssues.push(
-            `Suspicious patterns found in the ${component} component`
+            `Suspicious patterns found in the ${component} component`,
           );
         }
       }
@@ -729,11 +783,11 @@ export class NSS {
     // Generate overall recommendation
     if (hasCriticalIssue) {
       return `This URL contains potentially malicious patterns. ${componentIssues.join(
-        ". "
+        ". ",
       )}. Consider blocking this URL and scanning related systems for compromise.`;
     } else if (componentIssues.length > 1) {
       return `This URL has multiple suspicious components: ${componentIssues.join(
-        "; "
+        "; ",
       )}. Recommend further review before processing this URL.`;
     } else {
       return `This URL contains suspicious patterns. ${componentIssues[0]}. Proceed with caution and validate the URL source.`;
@@ -743,13 +797,13 @@ export class NSS {
    * Finds related patterns across different components that might indicate a sophisticated attack
    */
   private static findRelatedPatternGroups(
-    patterns: DetectedPattern[]
+    patterns: DetectedPattern[],
   ): RelatedPatternGroup[] {
     const groups: RelatedPatternGroup[] = [];
 
     // Find cross-site scripting patterns across multiple components
     const xssPatterns = patterns.filter(
-      (p) => p.type === MaliciousPatternType.XSS
+      (p) => p.type === MaliciousPatternType.XSS,
     );
     if (xssPatterns.length > 1) {
       groups.push({
@@ -762,7 +816,7 @@ export class NSS {
 
     // Find SQL injection patterns across multiple components
     const sqlInjectionPatterns = patterns.filter(
-      (p) => p.type === MaliciousPatternType.SQL_INJECTION
+      (p) => p.type === MaliciousPatternType.SQL_INJECTION,
     );
     if (sqlInjectionPatterns.length > 1) {
       groups.push({
@@ -777,7 +831,7 @@ export class NSS {
     const encodingPatterns = patterns.filter(
       (p) =>
         p.type === MaliciousPatternType.ENCODED_PAYLOAD ||
-        p.type === MaliciousPatternType.MULTI_ENCODING
+        p.type === MaliciousPatternType.MULTI_ENCODING,
     );
 
     // Check for encoding + injection combination (sophisticated attack)
@@ -788,7 +842,7 @@ export class NSS {
           p.type === MaliciousPatternType.XSS ||
           p.type === MaliciousPatternType.COMMAND_INJECTION ||
           p.type === MaliciousPatternType.TEMPLATE_INJECTION ||
-          p.type === MaliciousPatternType.NOSQL_INJECTION
+          p.type === MaliciousPatternType.NOSQL_INJECTION,
       );
 
       if (injectionPatterns.length > 0) {
@@ -806,7 +860,7 @@ export class NSS {
 
     // Detect potential combination attacks
     const hasRedirect = patterns.some(
-      (p) => p.type === MaliciousPatternType.OPEN_REDIRECT
+      (p) => p.type === MaliciousPatternType.OPEN_REDIRECT,
     );
     const hasXss = patterns.some((p) => p.type === MaliciousPatternType.XSS);
 
@@ -823,7 +877,7 @@ export class NSS {
 
     // Detect protocol confusion attacks
     const hasProtocolConfusion = patterns.some(
-      (p) => p.type === MaliciousPatternType.PROTOCOL_CONFUSION
+      (p) => p.type === MaliciousPatternType.PROTOCOL_CONFUSION,
     );
     const hasSsrf = patterns.some((p) => p.type === MaliciousPatternType.SSRF);
 
@@ -851,7 +905,7 @@ export class NSS {
     description: string,
     severity: "low" | "medium" | "high",
     results: DetectedPattern[],
-    options: Required<MaliciousPatternOptions>
+    options: Required<MaliciousPatternOptions>,
   ): void {
     for (const pattern of patterns) {
       const match = pattern.exec(input);
@@ -875,7 +929,7 @@ export class NSS {
 
         if (options.debug) {
           AppLogger.debug(
-            `NMPS: Detected ${type} pattern: '${matchedValue}' at index ${match.index}`
+            `NMPS: Detected ${type} pattern: '${matchedValue}' at index ${match.index}`,
           );
         }
 
@@ -891,11 +945,11 @@ export class NSS {
   private static checkSuspiciousParameters(
     input: string,
     results: DetectedPattern[],
-    options: Required<MaliciousPatternOptions>
+    options: Required<MaliciousPatternOptions>,
   ): void {
     try {
       // Try to extract parameter names from URL query string
-      let params: string[] = [];
+      let params: Array<{ name: string; value: string }> = [];
 
       // Check if input contains URL parameters
       const queryStart = input.indexOf("?");
@@ -907,26 +961,36 @@ export class NSS {
           const eqIndex = pair.indexOf("=");
           if (eqIndex !== -1) {
             const paramName = pair.substring(0, eqIndex).toLowerCase();
-            params.push(paramName);
+            const paramValue = pair.substring(eqIndex + 1);
+            params.push({ name: paramName, value: paramValue });
           }
         }
       }
 
-      // Check parameter names against suspicious list
+      // Check parameter names against suspicious list - but with context awareness
       for (const param of params) {
-        if (this.SUSPICIOUS_PARAMETER_NAMES.includes(param)) {
+        if (this.SUSPICIOUS_PARAMETER_NAMES.includes(param.name)) {
+          if (
+            this.isAllowlistedParameter(param.name, param.value, options) ||
+            this.isSuspiciousParameterSafe(param.name, param.value)
+          ) {
+            continue;
+          }
+
           results.push({
             type: MaliciousPatternType.SUSPICIOUS_PARAMETER,
             pattern: "suspicious_param_name",
-            location: `parameter: ${param}`,
+            location: `parameter: ${param.name}`,
             severity: "low",
             confidence: "medium",
-            description: `Suspicious parameter name "${param}" detected`,
-            matchedValue: param,
+            description: `Suspicious parameter name "${param.name}" detected`,
+            matchedValue: param.name,
           });
 
           if (options.debug) {
-            AppLogger.debug(`NMPS: Detected suspicious parameter: '${param}'`);
+            AppLogger.debug(
+              `NMPS: Detected suspicious parameter: '${param.name}'`,
+            );
           }
         }
       }
@@ -936,12 +1000,61 @@ export class NSS {
   }
 
   /**
+   * Checks if a suspicious parameter name is actually safe based on its context/value
+   */
+  private static isSuspiciousParameterSafe(
+    paramName: string,
+    paramValue: string,
+  ): boolean {
+    // Common legitimate query parameter patterns
+    const commonSafePrefixes = [
+      /^\d+$/, // Numbers only (page=1, limit=20)
+      /^[a-zA-Z0-9_\-]+$/, // Alphanumeric (standard REST params)
+      /^true|false|null$/i, // Booleans
+      /^\d{4}-\d{2}-\d{2}$/, // Dates (ISO format)
+      /^[a-f0-9\-]{36}$/i, // UUID
+      /^[A-Za-z0-9+/]+=*$/, // Base64 (legitimate encoding)
+    ];
+
+    // Check value against safe patterns
+    for (const pattern of commonSafePrefixes) {
+      if (pattern.test(paramValue)) {
+        return true;
+      }
+    }
+
+    // Safe parameter names that are common in REST APIs
+    const safeCommonParams = [
+      "page",
+      "limit",
+      "offset",
+      "sort",
+      "order",
+      "filter",
+      "search",
+      "q",
+      "id",
+      "ids",
+      "type",
+      "format",
+      "lang",
+      "version",
+    ];
+
+    if (safeCommonParams.includes(paramName)) {
+      return true;
+    }
+
+    return false;
+  }
+
+  /**
    * Calculates confidence level for a pattern match based on match characteristics
    */
   // In NehonixSecurity.service.txt
   private static calculateConfidence(
     matchedValue: string,
-    fullInput: string
+    fullInput: string,
   ): "low" | "medium" | "high" {
     const matchRatio = matchedValue.length / fullInput.length;
 
@@ -984,7 +1097,7 @@ export class NSS {
   // In NehonixSecurity.service.txt
   private static isLikelyFalsePositive(
     match: string,
-    fullInput: string
+    fullInput: string,
   ): boolean {
     const falsePositiveContexts = [
       /https?:\/\/[^\/]+\/documentation\/examples?\/.*sql/i,
@@ -1017,7 +1130,7 @@ export class NSS {
    */
   private static calculateContextScore(
     match: RegExpExecArray,
-    fullInput: string
+    fullInput: string,
   ): number {
     let score = 1.0;
 
@@ -1056,7 +1169,7 @@ export class NSS {
   private static performContextualAnalysis(
     patterns: DetectedPattern[],
     fullInput: string,
-    options: MaliciousPatternOptions
+    options: MaliciousPatternOptions,
   ): ContextAnalysisResult {
     // Find relationships between detected patterns
     const relatedGroups: RelatedPatternGroup[] =
@@ -1066,7 +1179,10 @@ export class NSS {
     const entropyScore = this.calculateEntropy(fullInput);
 
     // Detect potential encoding layers
-    const encodingLayers = this.detectEncodingLayers(fullInput);
+    const encodingLayers = this.detectEncodingLayers(
+      fullInput,
+      options.advanced?.maxEncodingLayers ?? 5,
+    );
 
     // Calculate anomaly score based on character distribution
     const anomalyScore = this.calculateAnomalyScore(fullInput);
@@ -1106,11 +1222,10 @@ export class NSS {
   /**
    * Detects number of potential encoding layers in a string
    */
-  private static detectEncodingLayers(input: string): number {
+  private static detectEncodingLayers(input: string, maxLayers = 5): number {
     let layers = 0;
     let currentInput = input;
 
-    const maxLayers = 5; // Prevent infinite loops
     let attempts = 0;
 
     while (attempts < maxLayers) {
@@ -1173,7 +1288,15 @@ export class NSS {
       // Base64
       if (/^[A-Za-z0-9+/=]+$/.test(decoded)) {
         try {
-          const temp = Buffer.from(decoded, "base64").toString();
+          const BufferClass = (globalThis as any).Buffer;
+          let temp = decoded;
+
+          if (BufferClass && typeof BufferClass.from === "function") {
+            temp = BufferClass.from(decoded, "base64").toString();
+          } else if (typeof atob !== "undefined") {
+            temp = decodeURIComponent(escape(atob(decoded)));
+          }
+
           if (temp !== decoded && temp.length > 0) {
             layers++;
             currentInput = temp;
@@ -1276,28 +1399,42 @@ export class NSS {
   // In NehonixSecurity.service.txt
   private static calculateTotalScore(
     patterns: DetectedPattern[],
-    sensitivityMultiplier: number
+    sensitivityMultiplier: number,
+    options?: Required<MaliciousPatternOptions> | MaliciousPatternOptions,
   ): number {
     if (patterns.length === 0) return 0;
 
     let score = 0;
 
-    const severityScores = {
+    const defaultSeverityScores = {
       high: 40,
       medium: 20,
       low: 10,
     };
 
-    const criticalPatternMultipliers = {
+    const defaultCriticalPatternMultipliers = {
       [MaliciousPatternType.PATH_TRAVERSAL]: 1.5,
       [MaliciousPatternType.SSRF]: 1.5,
       [MaliciousPatternType.RFI]: 1.5,
     };
 
-    const confidenceMultipliers = {
+    const defaultConfidenceMultipliers = {
       high: 1.5,
       medium: 1.0,
       low: 0.5,
+    };
+
+    const severityScores = {
+      ...defaultSeverityScores,
+      ...(options?.advanced?.scoring?.severityScores ?? {}),
+    };
+    const confidenceMultipliers = {
+      ...defaultConfidenceMultipliers,
+      ...(options?.advanced?.scoring?.confidenceMultipliers ?? {}),
+    };
+    const criticalPatternMultipliers = {
+      ...defaultCriticalPatternMultipliers,
+      ...(options?.advanced?.scoring?.criticalPatternMultipliers ?? {}),
     };
 
     for (const pattern of patterns) {
@@ -1306,17 +1443,14 @@ export class NSS {
         confidenceMultipliers[pattern.confidence];
 
       // Apply critical pattern multiplier
-      if (
+      const criticalMultiplier =
         criticalPatternMultipliers[
           pattern.type as keyof typeof criticalPatternMultipliers
-        ]
-      ) {
-        patternScore *=
-          criticalPatternMultipliers[
-            pattern.type as keyof typeof criticalPatternMultipliers
-          ];
-      }
+        ];
 
+      if (criticalMultiplier !== undefined) {
+        patternScore *= criticalMultiplier;
+      }
       if (pattern.contextScore) {
         patternScore *= pattern.contextScore;
       }
@@ -1345,7 +1479,7 @@ export class NSS {
    */
   static determineConfidence(
     score: number,
-    patternCount: number
+    patternCount: number,
   ): "low" | "medium" | "high" {
     if (score >= 75 || (score >= 50 && patternCount >= 3)) {
       return "high";
@@ -1361,7 +1495,7 @@ export class NSS {
    */
   static generateRecommendation(
     patterns: DetectedPattern[],
-    score: number
+    score: number,
   ): string {
     if (patterns.length === 0) {
       return "No malicious patterns detected. Input appears safe.";
@@ -1373,52 +1507,52 @@ export class NSS {
     // Critical recommendations first
     if (score >= 75) {
       recommendations.push(
-        "HIGH RISK: Input contains malicious patterns. Block and investigate immediately."
+        "HIGH RISK: Input contains malicious patterns. Block and investigate immediately.",
       );
     } else if (score >= 50) {
       recommendations.push(
-        "MEDIUM RISK: Input contains suspicious patterns. Validate before processing."
+        "MEDIUM RISK: Input contains suspicious patterns. Validate before processing.",
       );
     } else {
       recommendations.push(
-        "LOW RISK: Input contains potentially suspicious patterns. Use caution."
+        "LOW RISK: Input contains potentially suspicious patterns. Use caution.",
       );
     }
 
     // Specific recommendations based on pattern types
     if (patternTypes.has(MaliciousPatternType.SQL_INJECTION)) {
       recommendations.push(
-        "Implement prepared statements or parameterized queries for database operations."
+        "Implement prepared statements or parameterized queries for database operations.",
       );
     }
 
     if (patternTypes.has(MaliciousPatternType.XSS)) {
       recommendations.push(
-        "Implement output encoding and content security policy (CSP) headers."
+        "Implement output encoding and content security policy (CSP) headers.",
       );
     }
 
     if (patternTypes.has(MaliciousPatternType.COMMAND_INJECTION)) {
       recommendations.push(
-        "Avoid direct command execution. Use restricted APIs and allowlists."
+        "Avoid direct command execution. Use restricted APIs and allowlists.",
       );
     }
 
     if (patternTypes.has(MaliciousPatternType.PATH_TRAVERSAL)) {
       recommendations.push(
-        "Validate file paths and use path canonicalization before file operations."
+        "Validate file paths and use path canonicalization before file operations.",
       );
     }
 
     if (patternTypes.has(MaliciousPatternType.SSRF)) {
       recommendations.push(
-        "Implement allowlists for external resource access and validate URLs."
+        "Implement allowlists for external resource access and validate URLs.",
       );
     }
 
     if (patternTypes.has(MaliciousPatternType.RFI)) {
       recommendations.push(
-        "Validate file inclusions against a whitelist of allowed sources and disable remote file access."
+        "Validate file inclusions against a whitelist of allowed sources and disable remote file access.",
       );
     }
     if (
@@ -1426,7 +1560,7 @@ export class NSS {
       patternTypes.has(MaliciousPatternType.MULTI_ENCODING)
     ) {
       recommendations.push(
-        "Decode and normalize input before validation to prevent evasion techniques."
+        "Decode and normalize input before validation to prevent evasion techniques.",
       );
     }
 
@@ -1444,7 +1578,7 @@ export class NSS {
   static detectSpecificPatternType(
     input: string,
     patternType: MaliciousPatternType,
-    options: MaliciousPatternOptions = {}
+    options: MaliciousPatternOptions = {},
   ): boolean {
     // Use full detection but filter for specific pattern type
     const result = this.detectMaliciousPatterns(input, {
@@ -1477,7 +1611,7 @@ export class NSS {
       strictMode?: boolean;
       preserveLength?: boolean;
       customPatterns?: Array<{ pattern: RegExp; replacement: string }>;
-    } = {}
+    } = {},
   ): string {
     try {
       if (!input) return "";
@@ -1499,13 +1633,15 @@ export class NSS {
         sanitized = sanitized
           .replace(
             /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
-            opts.preserveLength ? this.createPlaceholder("script-block", 0) : ""
+            opts.preserveLength
+              ? this.createPlaceholder("script-block", 0)
+              : "",
           )
           .replace(
             /<\s*script[^>]*>(.*?)<\s*\/\s*script\s*>/gi,
             opts.preserveLength
               ? this.createPlaceholder("script-inline", 0)
-              : ""
+              : "",
           );
 
         // More comprehensive HTML tag handling
@@ -1517,9 +1653,9 @@ export class NSS {
             return safeTag
               ? match
               : opts.preserveLength
-              ? this.createPlaceholder("tag", match.length)
-              : `&lt;${tag}${attrs}&gt;`;
-          }
+                ? this.createPlaceholder("tag", match.length)
+                : `&lt;${tag}${attrs}&gt;`;
+          },
         );
 
         // Remove event handlers with more extensive coverage
@@ -1531,7 +1667,7 @@ export class NSS {
         // More comprehensive JavaScript URL blocking
         sanitized = sanitized.replace(
           /\b(href|src|data|action|formaction)\s*=\s*["']?\s*(javascript|data|vbscript):/gi,
-          (_, attr, protocol) => `${attr}="${protocol}_blocked:"`
+          (_, attr, protocol) => `${attr}="${protocol}_blocked:"`,
         );
       }
 
@@ -1757,7 +1893,7 @@ export class NSS {
           ? ""
           : url.replace(
               new RegExp(protocol, "gi"),
-              `${protocol.replace(":", "_blocked:")}`
+              `${protocol.replace(":", "_blocked:")}`,
             );
       }
     }
@@ -1816,7 +1952,7 @@ export class NSS {
               this.sanitizeInput(redirectValue, {
                 ...opts,
                 strictMode: true, // More strict for embedded URLs
-              })
+              }),
             );
           }
         }

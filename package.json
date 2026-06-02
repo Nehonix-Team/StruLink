@@ -26,7 +26,7 @@
     "LICENSE"
   ],
   "engines": {
-    "node": "\u003e=22.12.0"
+    "node": ">=22.12.0"
   },
   "repository": {
     "type": "git",
@@ -52,12 +52,13 @@
   "scripts": {
     "build": "rollup -c",
     "dev": "rollup -c -w",
-    "major": "npm version major \u0026\u0026 npm publish",
-    "minor": "npm version minor \u0026\u0026 npm publish",
-    "patch": "npm version patch \u0026\u0026 npm publish",
+    "major": "npm version major && npm publish",
+    "minor": "npm version minor && npm publish",
+    "patch": "npm version patch && npm publish",
     "prepare": "npm run build",
     "prepublishOnly": "npm run build",
-    "test": "jest"
+    "test": "jest",
+    "test:url:scan": "bun url-testing.ts && bun report-generator.ts && open security-report.md"
   },
   "dependencies": {
     "idna-uts46-hx": "^6.0.8"

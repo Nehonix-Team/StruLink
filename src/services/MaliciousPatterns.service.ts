@@ -32,6 +32,39 @@ export interface RelatedPatternGroup {
   riskMultiplier: number;
 }
 
+export interface PatternOverride {
+  type: MaliciousPatternType;
+  add?: RegExp[];
+  remove?: RegExp[];
+  replace?: RegExp[];
+}
+
+export interface AllowlistConfig {
+  domains?: string[];
+  hostnames?: string[];
+  parameterNames?: string[];
+  parameterValuePatterns?: RegExp[];
+  protocols?: string[];
+  tlds?: string[];
+}
+
+export interface AdvancedDetectionConfig {
+  maxEncodingLayers?: number;
+  entropyThreshold?: number;
+  scoring?: {
+    severityScores?: Partial<Record<"low" | "medium" | "high", number>>;
+    confidenceMultipliers?: Partial<Record<"low" | "medium" | "high", number>>;
+    criticalPatternMultipliers?: Partial<Record<MaliciousPatternType, number>>;
+  };
+  contextual?: {
+    relatedPatternMultiplier?: number;
+    enableRelatedPatternGrouping?: boolean;
+  };
+  anomaly?: {
+    maxScore?: number;
+  };
+}
+
 /**
  * Interface defining a detected malicious pattern
  */
@@ -123,6 +156,10 @@ export interface MaliciousPatternOptions {
    */
   ignorePatterns?: MaliciousPatternType[];
   /**
+   * List of pattern types to explicitly enable. If set, only these types are evaluated.
+   */
+  enabledPatternTypes?: MaliciousPatternType[];
+  /**
    * Adjust sensitivity for detections (0.1-2.0)
    * Lower values mean less sensitive, higher values mean more sensitive
    */
@@ -136,6 +173,14 @@ export interface MaliciousPatternOptions {
     severity: "low" | "medium" | "high";
     description: string;
   }>;
+  /**
+   * Custom pattern overrides for built-in detection sets
+   */
+  patternOverrides?: PatternOverride[];
+  /**
+   * Allowlist configuration for safe values and domains
+   */
+  allowlist?: AllowlistConfig;
   /**
    * Enable contextual analysis for improved detection
    */
@@ -156,6 +201,10 @@ export interface MaliciousPatternOptions {
    * Character set to focus on for pattern matching (default: latin)
    */
   characterSet?: "latin" | "unicode" | "all";
+  /**
+   * Advanced detection tuning parameters
+   */
+  advanced?: AdvancedDetectionConfig;
 }
 
 /**
@@ -221,7 +270,7 @@ export interface TrainingDataPoint {
   url: string;
   features: URLFeatures;
   isMalicious: boolean;
-  detectedPatternTypes: MaliciousPatternType[]; 
+  detectedPatternTypes: MaliciousPatternType[];
   score: number;
   timestamp: number;
 }

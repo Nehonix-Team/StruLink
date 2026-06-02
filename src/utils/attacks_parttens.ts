@@ -1,14 +1,17 @@
 export class PATTERNS {
   // ========== SQL INJECTION PATTERNS ==========
   static readonly SQL_INJECTION_PATTERNS = [
+    // Classic quote + comment bypass (must be early in list)
+    /['"]\s*(?:--|#|\/\*)\s*(?:&|$)/i,
+
     // Master pattern with improved context awareness
     /(?<=(\?|&|\s|;|=|:))(('|\s|\+|%20)+(or|and|union|select|insert|update|delete|drop|alter|create|exec|from|where)\s+(('|\+|%20|%27)*(\d+\s*=\s*\d+|\d+\s*>\s*\d+|'[^']*'\s*=\s*'[^']*'|x=x|1=1|true|false)|\(|--|#|\/\*))/i,
 
     // Improved detection of SQL operators in conditional context
     /\b(or|and)\s+(['"]?\d+['"]?\s*(=|<|>|<=|>=|<>|!=)\s*['"]?\d+['"]?|['"][^'"]*['"]?\s*(=|<|>|<=|>=|<>|!=)\s*['"][^'"]*['"]|x\s*=\s*x)/i,
 
-    // Better boundaries for SQL commands
-    /\b(union\s+select|select\s+.*?\bfrom\b|delete\s+from|update\s+.*?\bset\b|insert\s+into)\b(?!\s+[-\w]+\s*\()/i,
+    // Better boundaries for SQL commands - including DROP variations
+    /\b(union\s+select|select\s+.*?\bfrom\b|delete\s+from|drop\s+(?:table|database|schema)|update\s+.*?\bset\b|insert\s+into|truncate\s+table)\b/i,
 
     // Comment-based attacks with improved boundaries
     /(?<=(\?|&|\s|;|=|:))(--\s+|;\s*--|#|\/\*.*?\*\/)/i,
@@ -37,6 +40,9 @@ export class PATTERNS {
 
   // ========== XSS PATTERNS ==========
   static readonly XSS_PATTERNS = [
+    // Dangerous protocols (javascript:, vbscript:, data:, etc.) in parameters
+    /(?:\?|&|=|:|href=|src=|action=|formaction=)((?:javascript|vbscript|data|file):[^&\s]*)/i,
+
     // Script tag variations with improved boundaries
     /(?:<|&lt;|\%3C)([^>]*)script([^>]*)(?:>|&gt;|\%3E)/i,
 
@@ -162,38 +168,47 @@ export class PATTERNS {
 
   // ========== SSRF PATTERNS ==========
   static readonly SSRF_PATTERNS = [
+    // Decimal IP notation - converts to standard IP (2130706433 = 127.0.0.1)
+    /(?:url|uri|endpoint|site|server|host|server_url|source|target|load|fetch|read|src|img|image)=(?:https?:\/\/)?(?<!\w)(?:429496729[0-5]|42949672[0-8][0-9]|4294967[0-1][0-9]{2}|429496[0-6][0-9]{3}|42949[0-5][0-9]{4}|4294[0-8][0-9]{5}|429[0-3][0-9]{6}|42[0-8][0-9]{7}|4[0-1][0-9]{8}|[0-3][0-9]{9}|[0-2][0-9]{8})(?:\D|$)/i,
+
+    // Simple decimal IP detection in parameter values (catch 2130706433 and similar)
+    /(?:\?|&)(?:url|uri|endpoint|site|server|host|server_url|source|target|load|fetch|read|src|img|image)=(?:https?:\/\/)?(?<![\w.])(?:429496729[0-5]|42949672[0-8][0-9]|4294967[0-1][0-9]{2}|429496[0-6][0-9]{3}|42949[0-5][0-9]{4}|4294[0-8][0-9]{5}|429[0-3][0-9]{6}|42[0-8][0-9]{7}|4[0-1][0-9]{8}|[0-3][0-9]{9}|[0-2][0-9]{8})(?:\/|$)/i,
+
     // Internal/private network targeting with better context
-    /(?:url|uri|endpoint|site|server|host|server_url|source|target|load|fetch|read)=(?:https?:\/\/(?:127\.0\.0\.1|localhost|0\.0\.0\.0|::1|10\.\d{1,3}\.\d{1,3}\.\d{1,3}|172\.(?:1[6-9]|2\d|3[0-1])\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3}|169\.254\.\d{1,3}\.\d{1,3}|fc00::|fe80::)(?::|%3A)?(?:\d+)?(?:\/|%2F)?)/i,
+    /(?:url|uri|endpoint|site|server|host|server_url|source|target|load|fetch|read|src|img|image)=(?:https?:\/\/(?:127\.0\.0\.1|localhost|0\.0\.0\.0|::1|10\.\d{1,3}\.\d{1,3}\.\d{1,3}|172\.(?:1[6-9]|2\d|3[0-1])\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3}|169\.254\.\d{1,3}\.\d{1,3}|fc00::|fe80::)(?::|%3A)?(?:\d+)?(?:\/|%2F)?)/i,
 
     // Non-HTTP protocol wrappers
-    /(?:url|uri|endpoint|site|server|host|source|target|load|fetch|read)=(?:ftp|gopher|file|dict|mongodb|redis|ldap|tftp|ssh|telnet|smtp|imap|jar|zip|netdoc|php):\/\//i,
+    /(?:url|uri|endpoint|site|server|host|source|target|load|fetch|read|src)=(?:ftp|gopher|file|dict|mongodb|redis|ldap|tftp|ssh|telnet|smtp|imap|jar|zip|netdoc|php):\/\//i,
 
     // Cloud metadata services targeting
-    /(?:url|uri|endpoint|site|server|host|source|target|load|fetch|read)=(?:https?:\/\/(?:169\.254\.169\.254|metadata\.google\.internal|metadata\.azure\.internal|metadata\.gcp\.internal|169\.254\.170\.2|fd00:ec2::254))/i,
+    /(?:url|uri|endpoint|site|server|host|source|target|load|fetch|read|src)=(?:https?:\/\/(?:169\.254\.169\.254|metadata\.google\.internal|metadata\.azure\.internal|metadata\.gcp\.internal|169\.254\.170\.2|fd00:ec2::254))/i,
 
     // DNS rebinding protection bypass
-    /(?:url|uri|endpoint|site|server|host|source|target|load|fetch|read)=(?:https?:\/\/(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?#?&?[?]?(?:host=|ip=|url=|redirect=|redir=|location=|to=|from=|src=|uri=|path=|ref=|reference=))/i,
+    /(?:url|uri|endpoint|site|server|host|source|target|load|fetch|read|src)=(?:https?:\/\/(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?#?&?[?]?(?:host=|ip=|url=|redirect=|redir=|location=|to=|from=|src=|uri=|path=|ref=|reference=))/i,
 
     // Service discovery exploitation
-    /(?:url|uri|endpoint|site|server|host|source|target|load|fetch|read)=(?:https?:\/\/(?:etcd|consul|eureka|kubernetes|docker|rancher|vault|admin|jenkins|gitlab|elastic|solr|mongo|redis|memcache|smtp)(?::(?:\d+))?\/)/i,
+    /(?:url|uri|endpoint|site|server|host|source|target|load|fetch|read|src)=(?:https?:\/\/(?:etcd|consul|eureka|kubernetes|docker|rancher|vault|admin|jenkins|gitlab|elastic|solr|mongo|redis|memcache|smtp)(?::(?:\d+))?\/)/i,
 
     // Local file inclusion via SSRF
-    /(?:url|uri|endpoint|site|server|host|source|target|load|fetch|read)=(?:file:\/\/\/(?:etc|var|root|home|proc|sys|dev|tmp|usr|bin|sbin))/i,
+    /(?:url|uri|endpoint|site|server|host|source|target|load|fetch|read|src)=(?:file:\/\/\/(?:etc|var|root|home|proc|sys|dev|tmp|usr|bin|sbin))/i,
 
     // IPv6 localhost variants
-    /(?:url|uri|endpoint|site|server|host|source|target|load|fetch|read)=(?:https?:\/\/(?:\[::1\]|\[0:0:0:0:0:0:0:1\]|\[::ffff:127.0.0.1\])(?::|%3A)?(?:\d+)?(?:\/|%2F)?)/i,
+    /(?:url|uri|endpoint|site|server|host|source|target|load|fetch|read|src)=(?:https?:\/\/(?:\[::1\]|\[0:0:0:0:0:0:0:1\]|\[::ffff:127.0.0.1\])(?::|%3A)?(?:\d+)?(?:\/|%2F)?)/i,
 
     // URL scheme confusion
-    /(?:url|uri|endpoint|site|server|host|source|target|load|fetch|read)=(?:https?:\/\/[^\/]+@(?:127\.0\.0\.1|localhost|0\.0\.0\.0))/i,
+    /(?:url|uri|endpoint|site|server|host|source|target|load|fetch|read|src)=(?:https?:\/\/[^\/]+@(?:127\.0\.0\.1|localhost|0\.0\.0\.0))/i,
 
     // Non-standard ports for internal services
-    /(?:url|uri|endpoint|site|server|host|source|target|load|fetch|read)=(?:https?:\/\/[^\/]+:(?:22|445|1433|3306|5432|6379|8086|9000|9090|9200|27017))/i,
+    /(?:url|uri|endpoint|site|server|host|source|target|load|fetch|read|src)=(?:https?:\/\/[^\/]+:(?:22|445|1433|3306|5432|6379|8086|9000|9090|9200|27017))/i,
   ];
 
   // ========== CRLF INJECTION PATTERNS ==========
   static readonly CRLF_INJECTION_PATTERNS = [
-    // Basic CRLF with context awareness
-    /(?:%0[dD]%0[aA]|%0[aA]%0[dD]|\\r\\n|\\n|\\r|%5[cC]r%5[cC]n)(?:(?:[hH][tT][tT][pP]\/(?:1\.0|1\.1|2\.0)\s+\d+|Content-(?:Type|Length|Encoding|Disposition)|Location|Set-Cookie|X-XSS-Protection|X-Frame-Options|Content-Security-Policy): |<script|alert\(|function\s*\(|javascript:|@import|document\.(?:cookie|location|write)|window\.)/i,
+    // Basic CRLF with context awareness - simplified to catch more variations
+    /(?:%0[dD]%0[aA]|%0[aA]%0[dD]|%0[aA]|%0[dD]|\\r\\n|\\n|\\r)(?:(?:[hH][tT][tT][pP]\/(?:1\.0|1\.1|2\.0)\s+\d+|Content-(?:Type|Length|Encoding|Disposition)|Location|Set-Cookie|X-XSS-Protection|X-Frame-Options|Content-Security-Policy|X-Injected-Header): |<script|alert\(|function\s*\(|javascript:|@import|document\.(?:cookie|location|write)|window\.)/i,
+
+    // Alternative encoding - newline chars alone or with headers
+    /(?:%0[aA]|%0[dD]|\r|\n)(?:\s*(?:[a-zA-Z-]+:\s*[^\r\n]*|[hH][tT][tT][pP]\/(?:1\.0|1\.1|2\.0)|<))/i,
 
     // Advanced encoding detection
     /(?:%E5%98%8A%E5%98%8D|%0[dD]|%0[aA]|%5[cC]r|%5[cC]n|\r|\n){2,}(?:[hH][tT][tT][pP]\/(?:1\.0|1\.1|2\.0)\s+\d+|[a-zA-Z-]+:\s*[^\r\n]*)/i,
@@ -210,26 +225,20 @@ export class PATTERNS {
 
   // ========== TEMPLATE INJECTION PATTERNS ==========
   static readonly TEMPLATE_INJECTION_PATTERNS = [
-    // Server-side template injection with better context
-    /{{[\s\S]*?(?:system|exec|popen|subprocess|os|writeFile|readFile|child_process|eval|[Pp]rocessBuilder|Runtime)[\s\S]*?}}/i,
+    // Jinja2/Django template basic expressions and dangerous functions
+    /{{[\s\S]*?(?:config|request|settings|environ|system|exec|popen|bash|sh|\d\s*[*+\-/]\s*\d)[\s\S]*?}}/i,
 
-    // Template expression detection across frameworks
-    /(?:{{|<#|<%|\\${|#\{)[\s\S]*?(?:7\*7|2\*3\*2|3\.14|3\+4|5-2|1<<2|system|exec|__proto__|constructor|Object|Function|process\.env|global|module|require|child_process|spawn|forEach|toString|fromCharCode|eval|setTimeout|setInterval|Promise|fetch)[\s\S]*?(?:}}|#>|%>|\}|#\})/i,
+    // Template expression detection - be more specific, exclude timestamps and common valid patterns
+    /(?:{{|<#|<%|\\${|#\{)[\s\S]*?(?:constructor|__proto__|process\.env|global|module|require|child_process|spawn|eval|system|exec)[\s\S]*?(?:}}|#>|%>|\}|#\})/i,
 
-    // Framework-specific template injection
-    /{{\s*(?:constructor|self|this)(?:\.|(?:\['"\s*)]?)|(?:\[\s*["'`]?\s*)?(?:initializers|rawTemplate|innerTemplate|template|exec|code|script|view|render|compile|evaluate|parse|load|include)\s*(?:]?\s*['"`]?\s*\()?/i,
+    // Access control bypass attempts - only focus on dangerous properties
+    /{{[\s\S]*?(?:__proto__|__defineGetter__|__defineSetter__|__lookupGetter__|__lookupSetter__|prototype)[\s\S]*?}}/i,
 
-    // Access control bypass attempts
-    /{{\s*(?:config|settings|env|process|app|global|root|GLOBAL|__proto__|constructor|__defineGetter__|__defineSetter__|__lookupGetter__|__lookupSetter__|prototype)\s*[.[][\s\S]*?\s*}}/i,
+    // ERB/JSP injection - basic expressions with operators or dangerous functions
+    /<%[\s\S]*?(?:=|\s)[\s\S]*?(?:system|exec|eval|require|import|spawn|popen|7\s*\*\s*7|5\s*-\s*2)[\s\S]*?%>/i,
 
-    // Framework-specific server-side rendering exploits
-    /<(?:%|#)(?:=|:|-)?\s*(?:import|include|require|load|render|process|eval|exec|system|shell_exec|passthru|Request|response|application|session|cookie|end|puts|print|printf|write|system|eval|require|include|import|process|open|spawn)\s*(?:\(|[\s|.|:|\[])[\s\S]*?(?:%|#)>/i,
-
-    // Object property access to bypass restrictions
-    /{{\s*['"][\s\S]*?['"]\s*\[\s*['"](?:constructor|__proto__|prototype|__defineGetter__|__lookupGetter__)\s*['"]\s*\][\s\S]*?}}/i,
-
-    // Prevention of false positives in common legitimate template syntax
-    /{{(?!\s*(?:@?html\.|@?url\.|\s*(?:if|for|else|elseif|switch|case|default|while|do|try|catch|finally)))[\s\S]*?(?:\.(?:constructor|prototype|__proto__|global|process|child_process|exec|eval)|\[['"](constructor|prototype|__proto__|global|process|child_process|exec|eval)['"]\])[\s\S]*?}}/i,
+    // Object property access for dangerous methods only
+    /{{[\s\S]*?['"][\s\S]*?['"][\s\S]*?\[[\s\S]*?(?:constructor|__proto__|eval|exec|spawn)[\s\S]*?\][\s\S]*?}}/i,
   ];
 
   // ========== NOSQL INJECTION PATTERNS ==========
@@ -310,8 +319,8 @@ export class PATTERNS {
     // HTML entity encoding with minimum threshold and better specificity
     /(?:&#(?:x[0-9a-fA-F]{2}|[0-9]{2,3});){6,}/i,
 
-    // Base64 detection with improved boundaries and character validation
-    /(?:base64[,;:=]\s*(?:[A-Za-z0-9+/]){20,}(?:={0,2}))|(?:^|[=:()[\]{}|&!^,;]|url\(|data:)(?:[A-Za-z0-9+/]){30,}(?:={0,2})(?:$|[^A-Za-z0-9+/=])/i,
+    // Base64 detection ONLY in dangerous contexts (data: URIs with HTML/JS content)
+    /(?:data:(?:text\/html|text\/javascript|application\/javascript|application\/x-javascript|image\/svg\+xml);base64,(?:[A-Za-z0-9+/]){20,}(?:={0,2}))/i,
 
     // Protocol-independent URL encoding with better context
     /(?:%2F%2F|\/\/|\\\/\\\/|%5C%2F%5C%2F)(?:[\w%.-]+\.[\w%.-]+|\d{1,3}(?:\.\d{1,3}){3})/i,
@@ -321,9 +330,6 @@ export class PATTERNS {
 
     // Long hexadecimal values with improved boundaries
     /(?:\b0x[0-9a-fA-F]{10,}\b)/i,
-
-    // Data URI with potential payloads - improved specificity
-    /(?:data:(?:text\/html|text\/javascript|application\/javascript|application\/x-javascript|image\/svg\+xml);base64,(?:[A-Za-z0-9+/]){20,}(?:={0,2}))/i,
 
     // Character code conversion with better specificity
     /(?:String\.fromCharCode\((?:\d+(?:\s*,\s*\d+){7,})\))|(?:(?:\\u[0-9A-Fa-f]{4}|\\\d{1,3}|\\x[0-9A-Fa-f]{2})){12,}/i,
@@ -613,6 +619,8 @@ export class PATTERNS {
     "decrypt",
 
     // ----- DATABASE ACCESS (MEDIUM RISK) -----
+    // Removed: "select", "insert", "update", "delete", "where", "from", "join", "group", "order", "having", "limit"
+    // These are standard REST query parameters and cause false positives
     "db",
     "database",
     "query",
@@ -624,17 +632,17 @@ export class PATTERNS {
     "db_name",
     "table",
     "column",
-    "select",
-    "insert",
-    "update",
-    "delete",
-    "where",
-    "from",
-    "join",
-    "group",
-    "order",
-    "having",
-    "limit",
+    // "select",      // Removed - Standard REST parameter (GraphQL field selection)
+    // "insert",      // Removed - Legitimate REST route verb
+    // "update",      // Removed - Legitimate REST route verb
+    // "delete",      // Removed - Legitimate REST route verb
+    // "where",       // Removed - Legitimate query parameter
+    // "from",        // Removed - Legitimate query parameter
+    // "join",        // Removed - Legitimate query parameter
+    // "group",       // Removed - Legitimate query parameter
+    // "order",       // Removed - Legitimate pagination parameter
+    // "having",      // Removed - Legitimate query parameter
+    // "limit",       // Removed - Legitimate pagination parameter (offset, page, limit are REST standards)
     "mongo",
     "redis",
     "memcache",
@@ -692,12 +700,13 @@ export class PATTERNS {
     "stub",
 
     // ----- WEB & FRONTEND (LOWER RISK) -----
+    // Removed: "script", "page", "filter", "layout", "template" - too generic and cause false positives
     "html",
     "xml",
     "json",
     "yaml",
     "text",
-    "script",
+    // "script",  // Removed - 'transcript' is legitimate
     "iframe",
     "embed",
     "object",
@@ -708,12 +717,12 @@ export class PATTERNS {
     "dom",
     "render",
     "view",
-    "template",
-    "layout",
-    "page",
+    // "template",  // Removed - Generic parameter name
+    // "layout",    // Removed - Too generic
+    // "page",      // Removed - Standard pagination parameter
     "content",
     "sanitize",
-    "filter",
+    // "filter",    // Removed - Standard REST parameter
     "encode",
     "decode",
     "transform",
