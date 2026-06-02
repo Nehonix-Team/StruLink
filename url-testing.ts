@@ -606,7 +606,7 @@ console.log(`Running ${testCases.length} test cases...\n`);
 
 for (const tc of testCases) {
   try {
-    const result = await __strl__.scanUrl(tc.url, {});
+    const result = await __strl__.scanUrl(tc.url, {ignorePatterns: });
 
     const gotMalicious = result.isMalicious;
     const passed = gotMalicious === tc.expectedMalicious;
