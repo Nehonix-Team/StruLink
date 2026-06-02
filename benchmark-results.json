@@ -1,27 +1,28 @@
 {
-  "count": 1000,
-  "totalMs": 1753,
-  "avgMs": 1.75,
+  "count": 10000,
+  "concurrency": 1,
+  "totalMs": 14671,
+  "avgMs": 1.47,
   "sample": [
     {
       "url": "https://example.com/resource?_b=0",
-      "timeMs": 36
+      "timeMs": 2
     },
     {
       "url": "https://example.com/resource?_b=1",
-      "timeMs": 6
+      "timeMs": 3
     },
     {
       "url": "https://example.com/resource?_b=2",
-      "timeMs": 4
+      "timeMs": 3
     },
     {
       "url": "https://example.com/resource?_b=3",
-      "timeMs": 4
+      "timeMs": 3
     },
     {
       "url": "https://example.com/resource?_b=4",
-      "timeMs": 2
+      "timeMs": 3
     },
     {
       "url": "https://example.com/resource?_b=5",
@@ -33,23 +34,23 @@
     },
     {
       "url": "https://example.com/resource?_b=7",
-      "timeMs": 3
+      "timeMs": 2
     },
     {
       "url": "https://example.com/resource?_b=8",
-      "timeMs": 3
+      "timeMs": 2
     },
     {
       "url": "https://example.com/resource?_b=9",
-      "timeMs": 3
+      "timeMs": 2
     },
     {
       "url": "https://example.com/resource?_b=10",
-      "timeMs": 5
+      "timeMs": 2
     },
     {
       "url": "https://example.com/resource?_b=11",
-      "timeMs": 3
+      "timeMs": 2
     },
     {
       "url": "https://example.com/resource?_b=12",
@@ -61,19 +62,19 @@
     },
     {
       "url": "https://example.com/resource?_b=14",
-      "timeMs": 3
+      "timeMs": 4
     },
     {
       "url": "https://example.com/resource?_b=15",
-      "timeMs": 3
+      "timeMs": 4
     },
     {
       "url": "https://example.com/resource?_b=16",
-      "timeMs": 3
+      "timeMs": 2
     },
     {
       "url": "https://example.com/resource?_b=17",
-      "timeMs": 3
+      "timeMs": 2
     },
     {
       "url": "https://example.com/resource?_b=18",
@@ -81,7 +82,7 @@
     },
     {
       "url": "https://example.com/resource?_b=19",
-      "timeMs": 3
+      "timeMs": 2
     },
     {
       "url": "https://example.com/resource?_b=20",
@@ -104,5 +105,5 @@
       "timeMs": 2
     }
   ],
-  "timestamp": "2026-06-02T11:56:18.426Z"
+  "timestamp": "2026-06-02T14:56:18.358Z"
 }
